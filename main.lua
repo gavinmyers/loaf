@@ -1,10 +1,13 @@
-min_dt = 1/12
+min_dt = 1/30
 next_time = love.timer.getTime()
 even = true
-start = 100
 sprites = nil
 sprites2 = nil
 p0 = nil
+sx = 0
+sy = 0
+cx = 100
+cy = 100
 
 function love.load()
   sprites  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
@@ -16,17 +19,23 @@ function love.update(dt)
   next_time = next_time + min_dt
 end
 
-function love.draw()
-  --rest of function here
-  if(even == true) then
-    even = false
-    love.graphics.draw(sprites, p0, 100, start)
-  else 
-    even = true 
-    love.graphics.draw(sprites2, p0, 100, start)
+function love.keypressed(key)
+  if key == "h" then
+    sx = -1 
+  elseif key == "l" then
+    sx = 1 
+  elseif key == "j" then
+    sy = 1
+  elseif key == "k" then
+    sy = -1
   end
-  start = start + 2 
-  love.graphics.print(next_time, 400, 300)
+end
+
+function love.draw()
+  love.graphics.draw(sprites, p0, cx, cy)
+  cx = cx + sx
+  cy = cy + sy 
+  love.graphics.print(sx .. "|" .. cx, 400, 300)
 
   local cur_time = love.timer.getTime()
   if next_time <= cur_time then
