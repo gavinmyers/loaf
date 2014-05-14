@@ -13,6 +13,8 @@ spd = 2
 cx = 100
 cy = 100
 gnd1 = nil
+gnd2 = nil
+shader = nil
 
 function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
   return x1 < x2+w2 and
@@ -22,14 +24,26 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
 end
 
 function love.load()
+    texture = love.graphics.newShader([[
+        vec4 effect(vec4 colour, Image image, vec2 local, vec2 screen)
+        {
+            // red and green components scale with texture coordinates
+            vec4 coord_colour = vec4(local.x, local.y, 0.0, 1.0);
+            // use the appropriate pixel from the texture
+            vec4 image_colour = Texel(image, local);
+            // mix the two colours equally
+            return mix(coord_colour, image_colour, 0.3);
+        }
+    ]])
   sprites  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
   sprites2  = love.graphics.newImage("resources/DawnLike_1/Characters/Player1.png")
   groundSprites  = love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png")
   groundBatch = love.graphics.newSpriteBatch(groundSprites, 4000)
   gnd1 = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
+  gnd2 = love.graphics.newQuad(16, 240, 16, 16, 336, 624)
   for x = 0, 60 do
     for y = 0, 40 do
-      groundBatch:add(gnd1,x * 16, y * 16)
+      groundBatch:add(gnd2,x * 16, y * 16)
     end
   end
   p0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
@@ -60,7 +74,9 @@ function love.keypressed(key)
 end
 
 function love.draw()
+  love.graphics.setShader(texture)
   love.graphics.draw(groundBatch, 0, 0)
+  love.graphics.setShader()
   love.graphics.draw(sprites, p0, cx, cy)
   love.graphics.draw(sprites, p1, 200, 200)
   if CheckCollision(cx+sx,cy+sy,16,16,200,200,16,16) == false then
