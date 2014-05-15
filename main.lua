@@ -12,6 +12,7 @@ sy = 0
 spd = 2
 cx = 100
 cy = 100
+tpos = 200
 gnd1 = nil
 gnd2 = nil
 shader = nil
@@ -25,15 +26,27 @@ end
 
 function love.load()
     texture = love.graphics.newShader([[
-        vec4 effect(vec4 colour, Image image, vec2 local, vec2 screen)
-        {
-            // red and green components scale with texture coordinates
-            vec4 coord_colour = vec4(local.x, local.y, 0.0, 1.0);
-            // use the appropriate pixel from the texture
-            vec4 image_colour = Texel(image, local);
-            // mix the two colours equally
-            return mix(coord_colour, image_colour, 0.3);
-        }
+    vec4 effect(vec4 color, Image texture, vec2 vTexCoord, vec2 pixel_coords)
+      {
+         vec4 sum = vec4(0.0);
+         number blurSize = 0.005;
+         //number d = distance(vTexCoord, mousePos/screenSize);
+         //number blurSize = clamp(1/d/screenSize.x, 0, 1.0);
+         // blur in y (vertical)
+         // take nine samples, with the distance blurSize between them
+         sum += texture2D(texture, vec2(vTexCoord.x - 4.0*blurSize, vTexCoord.y)) * 0.05;
+         sum += texture2D(texture, vec2(vTexCoord.x - 3.0*blurSize, vTexCoord.y)) * 0.09;
+         sum += texture2D(texture, vec2(vTexCoord.x - 2.0*blurSize, vTexCoord.y)) * 0.12;
+         sum += texture2D(texture, vec2(vTexCoord.x - blurSize, vTexCoord.y)) * 0.15;
+         sum += texture2D(texture, vec2(vTexCoord.x, vTexCoord.y)) * 0.16;
+         sum += texture2D(texture, vec2(vTexCoord.x + blurSize, vTexCoord.y)) * 0.15;
+         sum += texture2D(texture, vec2(vTexCoord.x + 2.0*blurSize, vTexCoord.y)) * 0.12;
+         sum += texture2D(texture, vec2(vTexCoord.x + 3.0*blurSize, vTexCoord.y)) * 0.09;
+         sum += texture2D(texture, vec2(vTexCoord.x + 4.0*blurSize, vTexCoord.y)) * 0.05;
+         
+         
+         return sum;
+      }
     ]])
   sprites  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
   sprites2  = love.graphics.newImage("resources/DawnLike_1/Characters/Player1.png")
@@ -43,7 +56,7 @@ function love.load()
   gnd2 = love.graphics.newQuad(16, 240, 16, 16, 336, 624)
   for x = 0, 60 do
     for y = 0, 40 do
-      groundBatch:add(gnd2,x * 16, y * 16)
+      groundBatch:add(gnd1,x * 16, y * 16)
     end
   end
   p0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
@@ -74,9 +87,19 @@ function love.keypressed(key)
 end
 
 function love.draw()
-  love.graphics.setShader(texture)
   love.graphics.draw(groundBatch, 0, 0)
+
+  love.graphics.setStencil(nil)
+  love.graphics.setShader(texture)
+  local poly  = love.graphics.polygon
+  tpos = tpos + sx 
+  love.graphics.setStencil(function()
+        poly("fill", 100,200, 250,tpos, 300,350)
+    end)
+  love.graphics.draw(groundBatch, 200, 200)
+
   love.graphics.setShader()
+  love.graphics.setStencil(nil)
   love.graphics.draw(sprites, p0, cx, cy)
   love.graphics.draw(sprites, p1, 200, 200)
   if CheckCollision(cx+sx,cy+sy,16,16,200,200,16,16) == false then
