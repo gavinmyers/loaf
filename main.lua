@@ -12,7 +12,7 @@ sy = 0
 spd = 2
 cx = 100
 cy = 100
-tpos = 200
+tpos = 0 
 gnd1 = nil
 gnd2 = nil
 shader = nil
@@ -29,7 +29,7 @@ function love.load()
     vec4 effect(vec4 color, Image texture, vec2 vTexCoord, vec2 pixel_coords)
       {
          vec4 sum = vec4(0.0);
-         number blurSize = 0.005;
+         number blurSize = 0.02;
          //number d = distance(vTexCoord, mousePos/screenSize);
          //number blurSize = clamp(1/d/screenSize.x, 0, 1.0);
          // blur in y (vertical)
@@ -45,7 +45,7 @@ function love.load()
          sum += texture2D(texture, vec2(vTexCoord.x + 4.0*blurSize, vTexCoord.y)) * 0.05;
          
          
-         return sum;
+         return sum * 0.9;
       }
     ]])
   sprites  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
@@ -53,10 +53,14 @@ function love.load()
   groundSprites  = love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png")
   groundBatch = love.graphics.newSpriteBatch(groundSprites, 4000)
   gnd1 = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
-  gnd2 = love.graphics.newQuad(16, 240, 16, 16, 336, 624)
+  gnd2 = love.graphics.newQuad(128, 256, 16, 16, 336, 624)
   for x = 0, 60 do
     for y = 0, 40 do
-      groundBatch:add(gnd1,x * 16, y * 16)
+      if math.random(100) >= 20 then
+        groundBatch:add(gnd1,x * 16, y * 16)
+      else 
+        groundBatch:add(gnd2,x * 16, y * 16)
+      end
     end
   end
   p0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
@@ -92,11 +96,16 @@ function love.draw()
   love.graphics.setStencil(nil)
   love.graphics.setShader(texture)
   local poly  = love.graphics.polygon
-  tpos = tpos + sx 
+  tpos = tpos + 1 
   love.graphics.setStencil(function()
-        poly("fill", 100,200, 250,tpos, 300,350)
+        poly("fill", 100+tpos,200+tpos,250+tpos/2,300+tpos,300+tpos,350+tpos)
     end)
-  love.graphics.draw(groundBatch, 200, 200)
+  love.graphics.draw(groundBatch, 0, 0)
+
+  love.graphics.setStencil(function()
+        poly("fill", 300+tpos/2,300+tpos,250+tpos,300+tpos,300+tpos,450+tpos)
+    end)
+  love.graphics.draw(groundBatch, 0, 0)
 
   love.graphics.setShader()
   love.graphics.setStencil(nil)
