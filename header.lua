@@ -1,0 +1,21 @@
+min_dt = 1/30
+next_time = love.timer.getTime()
+even = true
+sprites = nil
+sprites2 = nil
+groundSprites = nil
+groundBatch = nil
+p0 = nil
+p1 = nil
+sx = 0
+sy = 0
+spd = 2
+cx = 100
+cy = 100
+tpos = 0 
+gnd1 = nil
+gnd2 = nil
+shader = nil
+cloudLt = nil
+cloudDk = nil
+
