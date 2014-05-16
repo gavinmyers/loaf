@@ -25,6 +25,7 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
 end
 
 function love.load()
+    love.window.setMode(1440, 900, {fullscreen=true,resizable=true, vsync=false, minwidth=400, minheight=300})
     texture = love.graphics.newShader([[
     vec4 effect(vec4 color, Image texture, vec2 vTexCoord, vec2 pixel_coords)
       {
@@ -51,11 +52,11 @@ function love.load()
   sprites  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
   sprites2  = love.graphics.newImage("resources/DawnLike_1/Characters/Player1.png")
   groundSprites  = love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png")
-  groundBatch = love.graphics.newSpriteBatch(groundSprites, 4000)
+  groundBatch = love.graphics.newSpriteBatch(groundSprites, 14000)
   gnd1 = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
   gnd2 = love.graphics.newQuad(128, 256, 16, 16, 336, 624)
-  for x = 0, 60 do
-    for y = 0, 40 do
+  for x = 0, 160 do
+    for y = 0, 100 do
       if math.random(100) >= 20 then
         groundBatch:add(gnd1,x * 16, y * 16)
       else 
@@ -87,6 +88,8 @@ function love.keypressed(key)
   elseif key == " " then
     sx = 0 
     sy = 0 
+  elseif key == "escape" then
+    love.event.quit()
   end
 end
 
