@@ -16,6 +16,8 @@ tpos = 0
 gnd1 = nil
 gnd2 = nil
 shader = nil
+cloudLt = nil
+cloudDk = nil
 
 function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
   return x1 < x2+w2 and
@@ -26,7 +28,31 @@ end
 
 function love.load()
     love.window.setMode(1440, 900, {fullscreen=true,resizable=true, vsync=false, minwidth=400, minheight=300})
-    texture = love.graphics.newShader([[
+    cloudDk = love.graphics.newShader([[
+    vec4 effect(vec4 color, Image texture, vec2 vTexCoord, vec2 pixel_coords)
+      {
+         vec4 sum = vec4(0.0);
+         number blurSize = 0.02;
+         //number d = distance(vTexCoord, mousePos/screenSize);
+         //number blurSize = clamp(1/d/screenSize.x, 0, 1.0);
+         // blur in y (vertical)
+         // take nine samples, with the distance blurSize between them
+         sum += texture2D(texture, vec2(vTexCoord.x - 4.0*blurSize, vTexCoord.y)) * 0.05;
+         sum += texture2D(texture, vec2(vTexCoord.x - 3.0*blurSize, vTexCoord.y)) * 0.09;
+         sum += texture2D(texture, vec2(vTexCoord.x - 2.0*blurSize, vTexCoord.y)) * 0.12;
+         sum += texture2D(texture, vec2(vTexCoord.x - blurSize, vTexCoord.y)) * 0.15;
+         sum += texture2D(texture, vec2(vTexCoord.x, vTexCoord.y)) * 0.16;
+         sum += texture2D(texture, vec2(vTexCoord.x + blurSize, vTexCoord.y)) * 0.15;
+         sum += texture2D(texture, vec2(vTexCoord.x + 2.0*blurSize, vTexCoord.y)) * 0.12;
+         sum += texture2D(texture, vec2(vTexCoord.x + 3.0*blurSize, vTexCoord.y)) * 0.09;
+         sum += texture2D(texture, vec2(vTexCoord.x + 4.0*blurSize, vTexCoord.y)) * 0.05;
+         
+         
+         return sum * 0.6;
+      }
+    ]])
+
+    cloudLt = love.graphics.newShader([[
     vec4 effect(vec4 color, Image texture, vec2 vTexCoord, vec2 pixel_coords)
       {
          vec4 sum = vec4(0.0);
@@ -97,7 +123,20 @@ function love.draw()
   love.graphics.draw(groundBatch, 0, 0)
 
   love.graphics.setStencil(nil)
-  love.graphics.setShader(texture)
+  love.graphics.setShader(cloudLt)
+  local poly  = love.graphics.polygon
+  tpos = tpos + 1 
+  love.graphics.setStencil(function()
+        poly("fill", 125+tpos,225+tpos,275+tpos/2,305+tpos,305+tpos,355+tpos)
+    end)
+  love.graphics.draw(groundBatch, 0, 0)
+
+  love.graphics.setStencil(function()
+        poly("fill", 325+tpos/2,325+tpos,355+tpos,305+tpos,305+tpos,455+tpos)
+    end)
+  love.graphics.draw(groundBatch, 0, 0)
+
+  love.graphics.setShader(cloudDk)
   local poly  = love.graphics.polygon
   tpos = tpos + 1 
   love.graphics.setStencil(function()
@@ -110,6 +149,7 @@ function love.draw()
     end)
   love.graphics.draw(groundBatch, 0, 0)
 
+  
   love.graphics.setShader()
   love.graphics.setStencil(nil)
   love.graphics.draw(sprites, p0, cx, cy)
