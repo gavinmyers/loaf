@@ -101,6 +101,8 @@ function love.keypressed(key)
 end
 
 function love.draw()
+
+  love.graphics.setColor(15,125,135)
   love.graphics.draw(groundBatch, 0, 0)
 
   love.graphics.setStencil(nil)
