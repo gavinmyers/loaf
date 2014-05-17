@@ -5,7 +5,7 @@ require "graphics"
 area = nil
 function love.load()
   graphics.init()
-  area = map.create()
+  area = map.create(map.themes.cave)
   area.batch = graphics.renderMap(area.tiles)
 end
 

@@ -13,13 +13,13 @@ function graphics.init()
   local floor  = love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png")
   graphics.images["floor"] = floor 
 
-  local g0 = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
+  local g0 = love.graphics.newQuad(0, 0, 16, 16, 336, 624)
   graphics.sprites["g0"] = {sprite=floor,quad=g0}
 
-  local g1 = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
+  local g1 = love.graphics.newQuad(272, 0, 16, 16, 336, 624)
   graphics.sprites["g1"] = {sprite=floor,quad=g1}
 
-  local g2 = love.graphics.newQuad(128, 256, 16, 16, 336, 624)
+  local g2 = love.graphics.newQuad(256, 0, 16, 16, 336, 624)
   graphics.sprites["g2"] = {sprite=floor,quad=g2}
 
   local g3 = love.graphics.newQuad(256, 256, 16, 16, 336, 624)
