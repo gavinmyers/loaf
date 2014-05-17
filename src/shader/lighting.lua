@@ -1,5 +1,5 @@
 lighting = {}
-lighting._shaders = {}
+lighting.shaders = {}
 
 function lighting.init() 
   local cld01 = love.graphics.newShader([[
@@ -25,13 +25,7 @@ function lighting.init()
          return sum * 0.9;
       }
     ]])
-  lighting.setShader("cld01",cld01)
+  lighting.shaders["cld01"] = cld01
 end
 
-function lighting.setShader(k,v) 
-  lighting._shaders[k] = v
-end
 
-function lighting.getShader(k) 
-  return lighting._shaders[k]
-end
