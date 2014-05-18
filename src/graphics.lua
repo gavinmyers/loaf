@@ -1,3 +1,5 @@
+require "map"
+
 graphics = {}
 graphics.sprites = {}
 graphics.batches = {}
@@ -25,6 +27,12 @@ function graphics.init()
   local g3 = love.graphics.newQuad(256, 256, 16, 16, 336, 624)
   graphics.sprites["g3"] = {sprite=floor,quad=g3}
 
+  local g16 = love.graphics.newQuad(256, 256, 16, 16, 336, 624)
+  graphics.sprites["g16"] = {sprite=floor,quad=g16}
+
+  local g128 = love.graphics.newQuad(256, 256, 16, 16, 336, 624)
+  graphics.sprites["g128"] = {sprite=floor,quad=g128}
+
   local c0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
   graphics.sprites["c0"] = {sprite=player0,quad=c0}
 
@@ -40,11 +48,22 @@ function graphics.drawSprite(k,x,y)
   love.graphics.draw(o.sprite, o.quad, x, y)
 end
 
-function graphics.renderMap(m)
+function graphics.renderMap(w,h,m)
   local b = love.graphics.newSpriteBatch(graphics.images["floor"], 40000)
   for x = 1,200 do
     for y = 1,200 do
-      local s = "g"..m[x][y]
+      local s = "g0"
+      local v = m[x][y]
+      local t = map.types.source(v)
+      if t == map.types.full then
+        if v == map.types.primary(t) then
+          s = "g1"
+        elseif v == map.types.secondary(t) then
+          s = "g2"
+        end
+      elseif t == map.types.exit then
+        s = "g3"
+      end
       local q = graphics.sprites[s].quad
       b:add(q,x*16,y*16)
     end
