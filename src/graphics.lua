@@ -42,8 +42,8 @@ end
 
 function graphics.renderMap(m)
   local b = love.graphics.newSpriteBatch(graphics.images["floor"], 40000)
-  for x = 0,200 do
-    for y = 0,200 do
+  for x = 1,200 do
+    for y = 1,200 do
       local s = "g"..m[x][y]
       local q = graphics.sprites[s].quad
       b:add(q,x*16,y*16)

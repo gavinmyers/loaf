@@ -16,9 +16,9 @@ end
 function map.themes.default()
   math.randomseed(os.time())
   local tiles = {}
-  for x = 0, 200 do
+  for x = 1, 200 do
     tiles[x] = {}
-    for y = 0, 200 do
+    for y = 1, 200 do
       local t = math.random(0,3)
       tiles[x][y] = t 
     end
@@ -29,9 +29,9 @@ end
 function map.themes.cave() 
   math.randomseed(os.time())
   local tiles = {}
-  for x = 0, 200 do
+  for x = 1, 200 do
     tiles[x] = {}
-    for y = 0, 200 do
+    for y = 1, 200 do
       tiles[x][y] = 1 
     end
   end
@@ -41,39 +41,37 @@ function map.themes.cave()
   local ex = 0
   local ey = 0
   if q == 1 then
-    sx = math.random(20)
-    sy = math.random(20)
+    sx = math.random(1,20)
+    sy = math.random(1,20)
     ex = math.random(20) + 20
     ey = math.random(20) + 20
   elseif q == 2 then
     sx = math.random(20) + 20 
-    sy = math.random(20)
-    ex = math.random(20)
+    sy = math.random(1,20)
+    ex = math.random(1,20)
     ey = math.random(20) + 20
   elseif q == 3 then
-    sx = math.random(20)  
+    sx = math.random(1,20)  
     sy = math.random(20) + 20
     ex = math.random(20) + 20 
-    ey = math.random(20) 
+    ey = math.random(1,20) 
   else 
     sx = math.random(20) + 20 
     sy = math.random(20) + 20
-    ex = math.random(20) 
-    ey = math.random(20) 
+    ex = math.random(1,20) 
+    ey = math.random(1,20) 
   end
   local wx1 = sx
   local wy1 = sy
   local wx2 = ex
   local wy2 = ey
   local cntr = 0
-  while ((cntr < 100) or (wx1 ~= ex and wy1 ~= ey) or (wx2 ~= sx and wy2 ~= sy)) do
+  while true do 
     cntr = cntr + 1
     if wx1 == ex and wy1 == ey then
       break
     elseif wx2 == sx and wy2 == sy then
       break
-    elseif cntr > 10000 then
-      --break
     end
     d1 = math.random(1,4)
     d2 = math.random(1,4)
@@ -86,15 +84,15 @@ function map.themes.cave()
     elseif d1 == 4 then
       wy1 = wy1 - 1
     end
-    if wy1 < 0 then
-      wy1 = 0
-    elseif wy1 > 199 then
-      wy1 = 199
+    if wy1 < 1 then
+      wy1 = 1  
+    elseif wy1 > 49 then
+      wy1 = 49
     end 
-    if wx1 < 0 then
-      wx1 = 0
-    elseif wx1 > 199 then
-      wx1 = 199
+    if wx1 < 1 then
+      wx1 = 1 
+    elseif wx1 > 49 then
+      wx1 = 49
     end 
     tiles[wx1][wy1] = 0
     if d2 == 2 then
@@ -106,18 +104,20 @@ function map.themes.cave()
     elseif d2 == 4 then
       wy2 = wy2 - 1 
     end
-    if wy2 < 0 then
-      wy2 = 0
-    elseif wy2 > 299 then
-      wy2 = 299
+    if wy2 < 1 then
+      wy2 = 1 
+    elseif wy2 > 49 then
+      wy2 = 49
     end 
-    if wx2 < 0 then
-      wx2 = 0
-    elseif wx2 > 299 then
-      wx2 = 299
+    if wx2 < 1 then
+      wx2 = 1 
+    elseif wx2 > 49 then
+      wx2 = 49
     end 
     tiles[wx2][wy2] = 0
   end 
+  for i=1,3 do
+  end
   tiles[sx][sy] = 2 
   tiles[ex][ey] = 2 
   return tiles
