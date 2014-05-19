@@ -5,6 +5,8 @@ require "graphics"
 
 area = nil
 lightWorld = nil
+lightEnable = true
+
 function love.load()
   math.randomseed(os.time())
   graphics.init()
@@ -51,6 +53,8 @@ end
 function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
+  elseif key == "l" then
+    lightEnable = lightEnable == false
   elseif key == " " then
     area = map.create(200,200,map.themes.cave)
     area.batch = graphics.renderMap(area.width,area.height,area.tiles)
@@ -63,14 +67,18 @@ function love.update(dt)
 end
 
 function love.draw()
-  lightWorld.update()
-  lightWorld2.update()
+  if lightEnable then
+    lightWorld.update()
+    lightWorld2.update()
+  end
   love.graphics.draw(area.batch,0,0,0,1)
   love.graphics.print("loaf " .. area.tiles[1][1],0,0,0.5)
   graphics.drawSprite("c0", 32, 256)
-  lightWorld.drawShadow()
-  lightWorld2.drawShadow()
+  if lightEnable then
+    lightWorld.drawShadow()
+    lightWorld2.drawShadow()
 
-  lightWorld.drawShine()
-  lightWorld2.drawShine()
+    lightWorld.drawShine()
+    lightWorld2.drawShine()
+  end
 end
