@@ -23,7 +23,7 @@ function love.update(dt)
 end
 
 function love.draw()
-  love.graphics.draw(area.batch, 0, 0,0,0.15)
+  love.graphics.draw(area.batch,0,0,0,0.10)
   love.graphics.print("loaf " .. area.tiles[1][1],0,0,0,0.5)
   graphics.drawSprite("c0", 32, 256)
 end

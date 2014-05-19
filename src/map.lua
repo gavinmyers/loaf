@@ -12,27 +12,20 @@ function map.create(w,h,theme)
 end
 -- 0-8 free 
 -- 9-16 full 
--- 17-24 special 
--- 128 exit 
--- 256 player start 
-map.types = {}
-map.types.void = {255}
-map.types.free = {1,2,3,4,5,6,7,8}
-map.types.full = {9,10,11,12,13,14,15,16}
-map.types.exit = {128}
+map.types = {
+  void={0},
+  free={1,2,3,4,5,6,7,8},
+  full={9,10,11,12,13,14,15,16},
+  exit={128}}
 
-function map.types.source(v) 
-  -- >:(
-  if v == 255 then
-    return map.types.void
-  elseif v >=1 and v <= 8 then
-    return map.types.free
-  elseif v >= 9 and v <= 16 then
-    return map.types.full
-  elseif v == 128 then
-    return map.types.exit
-  else
-    return map.types.free
+
+function map.types.source(r) 
+  for k,v in pairs(map.types) do
+    if type(v) == "table" then 
+      if v[1] <= r and v[#v] >= r then
+        return v 
+      end
+    end
   end
 end
 
@@ -137,7 +130,7 @@ function map.themes.cave(w,h)
     elseif wx2 == sx and wy2 == sy then
       break
     elseif cntr > 100000 then
-      break
+      --break
     end
     d1 = math.random(1,4)
     d2 = math.random(1,4)
