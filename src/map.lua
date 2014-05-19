@@ -18,7 +18,6 @@ map.types = {
   full={9,10,11,12,13,14,15,16},
   exit={128}}
 
-
 function map.types.source(r) 
   for k,v in pairs(map.types) do
     if type(v) == "table" then 
@@ -46,7 +45,6 @@ function map.types.secondary(t)
 end
 
 function map.themes.default(w,h)
-  math.randomseed(os.time())
   local tiles = {}
   for x = 1,w do
     tiles[x] = {}
@@ -58,7 +56,6 @@ function map.themes.default(w,h)
 end
 
 function map.themes.cave(w,h) 
-  math.randomseed(os.time())
   local tiles = {}
   for x = 1,w+1 do
     tiles[x] = {}

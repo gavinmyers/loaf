@@ -50,15 +50,17 @@ end
 
 function graphics.renderMap(w,h,m)
   local b = love.graphics.newSpriteBatch(graphics.images["floor"], 40000)
-  for x = 1,200 do
-    for y = 1,200 do
+  for x = 1,w do
+    for y = 1,h do
       local s = "g0"
       local v = m[x][y]
       local t = map.types.source(v)
+      local pri = map.types.primary(t)
+      local sec = map.types.secondary(t)
       if t == map.types.full then
-        if v == map.types.primary(t) then
+        if v == pri then
           s = "g1"
-        elseif v == map.types.secondary(t) then
+        elseif v == sec then
           s = "g2"
         end
       elseif t == map.types.exit then
