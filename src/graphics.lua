@@ -6,53 +6,53 @@ graphics.batches = {}
 graphics.images = {}
 
 function graphics.floorPlan(w,h,c,f)
-  local _f = love.graphics.newQuad(w+16, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_NSEW"] = {sprite=f,quad=_f}
+  local q = love.graphics.newQuad(w+16, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."NSEW"] = {sprite=f,quad=q}
 
-  local _v = love.graphics.newQuad(w+80, h, 16, 16, 336, 624)
-  graphics.sprites[c.."_"] = {sprite=f,quad=_v}
+  local q = love.graphics.newQuad(w+80, h, 16, 16, 336, 624)
+  graphics.sprites[c..""] = {sprite=f,quad=q}
 
-  local _we = love.graphics.newQuad(w+80, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_WE"] = {sprite=f,quad=_we}
+  local q = love.graphics.newQuad(w+80, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."WE"] = {sprite=f,quad=q}
 
-  local _ns = love.graphics.newQuad(w+48, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_NS"] = {sprite=f,quad=_ns}
+  local q = love.graphics.newQuad(w+48, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."NS"] = {sprite=f,quad=q}
 
-  local _nsw = love.graphics.newQuad(w+32, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_NSW"] = {sprite=f,quad=_nsw}
+  local q = love.graphics.newQuad(w+32, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."NSW"] = {sprite=f,quad=q}
 
-  local _nwe = love.graphics.newQuad(w+16, h+32, 16, 16, 336, 624)
-  graphics.sprites[c.."_NWE"] = {sprite=f,quad=_nwe}
+  local q = love.graphics.newQuad(w+16, h+32, 16, 16, 336, 624)
+  graphics.sprites[c.."NWE"] = {sprite=f,quad=q}
 
-  local _swe = love.graphics.newQuad(w+16, h, 16, 16, 336, 624)
-  graphics.sprites[c.."_SWE"] = {sprite=f,quad=_swe}
+  local q = love.graphics.newQuad(w+16, h, 16, 16, 336, 624)
+  graphics.sprites[c.."SWE"] = {sprite=f,quad=q}
 
-  local _nse = love.graphics.newQuad(w, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_NSE"] = {sprite=f,quad=_nse}
+  local q = love.graphics.newQuad(w, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."NSE"] = {sprite=f,quad=q}
 
-  local _n = love.graphics.newQuad(w+48, h+32, 16, 16, 336, 624)
-  graphics.sprites[c.."_N"] = {sprite=f,quad=_n}
+  local q = love.graphics.newQuad(w+48, h+32, 16, 16, 336, 624)
+  graphics.sprites[c.."N"] = {sprite=f,quad=q}
 
-  local _s = love.graphics.newQuad(w+48, h, 16, 16, 336, 624)
-  graphics.sprites[c.."_S"] = {sprite=f,quad=_s}
+  local q = love.graphics.newQuad(w+48, h, 16, 16, 336, 624)
+  graphics.sprites[c.."S"] = {sprite=f,quad=q}
 
-  local _nw = love.graphics.newQuad(w+32, h+32, 16, 16, 336, 624)
-  graphics.sprites[c.."_NW"] = {sprite=f,quad=_nw}
+  local q = love.graphics.newQuad(w+32, h+32, 16, 16, 336, 624)
+  graphics.sprites[c.."NW"] = {sprite=f,quad=q}
 
-  local _sw = love.graphics.newQuad(w+32, h, 16, 16, 336, 624)
-  graphics.sprites[c.."_SW"] = {sprite=f,quad=_sw}
+  local q = love.graphics.newQuad(w+32, h, 16, 16, 336, 624)
+  graphics.sprites[c.."SW"] = {sprite=f,quad=q}
 
-  local _ne = love.graphics.newQuad(w, h+32, 16, 16, 336, 624)
-  graphics.sprites[c.."_NE"] = {sprite=f,quad=_ne}
+  local q = love.graphics.newQuad(w, h+32, 16, 16, 336, 624)
+  graphics.sprites[c.."NE"] = {sprite=f,quad=q}
 
-  local _se = love.graphics.newQuad(w, h, 16, 16, 336, 624)
-  graphics.sprites[c.."_SE"] = {sprite=f,quad=_se}
+  local q = love.graphics.newQuad(w, h, 16, 16, 336, 624)
+  graphics.sprites[c.."SE"] = {sprite=f,quad=q}
 
-  local _w = love.graphics.newQuad(w+96, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_W"] = {sprite=f,quad=_w}
+  local q = love.graphics.newQuad(w+96, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."W"] = {sprite=f,quad=q}
 
-  local _e = love.graphics.newQuad(w+64, h+16, 16, 16, 336, 624)
-  graphics.sprites[c.."_E"] = {sprite=f,quad=_e}
+  local e = love.graphics.newQuad(w+64, h+16, 16, 16, 336, 624)
+  graphics.sprites[c.."E"] = {sprite=f,quad=e}
 
 end
 
@@ -70,7 +70,7 @@ function graphics.init()
   graphics.sprites["g0"] = {sprite=floor,quad=g0}
 
   local g1 = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
-  graphics.sprites["g1"] = {sprite=floor,quad=g1}
+  graphics.sprites["g1X"] = {sprite=floor,quad=g1}
 
   graphics.floorPlan(224,48,"g1",floor)
 
@@ -152,7 +152,7 @@ function graphics.renderMap(w,h,m)
   local b = love.graphics.newSpriteBatch(graphics.images["floor"], 40000)
   for x = 2,w do
     for y = 2,h do
-      local s = "g1"
+      local s = "g1X"
       local v = m[x][y]
       local t = map.types.source(v)
       local pri = map.types.primary(t)
@@ -160,9 +160,9 @@ function graphics.renderMap(w,h,m)
       local typ = graphics.tile.style(x,y,m)
       if t == map.types.full then
         if v == pri then
-          s = "g1_" .. typ
+          s = "g1" .. typ
         elseif v == sec then
-          s = "g2_" .. typ
+          s = "g2" .. typ
         end
       elseif t == map.types.exit then
         s = "g3"
