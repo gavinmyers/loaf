@@ -105,22 +105,12 @@ end
 
 graphics.tile = {}
 function graphics.tile.style(x,y,tiles)
-  local e1 = tiles[x-1][y-1] 
-  local eW = tiles[x-1][y] 
-  local e3 = tiles[x-1][y+1] 
   local eN = tiles[x][y-1] 
-  local eX = tiles[x][y] 
   local eS = tiles[x][y+1] 
-  local e7 = tiles[x+1][y-1] 
   local eE = tiles[x+1][y] 
-  local e9 = tiles[x+1][y+1] 
-  local es = {e1,eW,e3,eN,eX,eS,e7,eE,e9}
-  local et = 0
-  for i, v in ipairs(es) do
-    if eX == v then
-      et = et + 1
-    end
-  end
+  local eW = tiles[x-1][y] 
+
+  local eX = tiles[x][y] 
   if eN ~= eX and eS ~= eX and eE ~= eX and eW ~= eX then 
     return ""
   elseif eN ~= eX and eS ~= eX and eE == eX and eW == eX then 
