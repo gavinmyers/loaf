@@ -17,15 +17,15 @@ end
 
 function light() 
   lightWorld = love.light.newWorld()
-  lightWorld.setAmbientColor(80, 80, 80) -- optional
-  lightMouse = lightWorld.newLight(0, 0, 255, 255, 255, 3000)
-  lightMouse.setGlowStrength(5) -- optional
+  lightWorld.setAmbientColor(40, 40, 40) -- optional
+  lightMouse = lightWorld.newLight(0, 0, 255, 255, 255, 300)
+  lightMouse.setGlowStrength(1) -- optional
 
   lightWorld2 = love.light.newWorld()
   lightWorld2.setAmbientColor(180, 180, 180) -- optional
 
   lightMouse2 = lightWorld2.newLight(0, 0, 255, 255, 255, 3000)
-  lightMouse2.setGlowStrength(5) -- optional
+  lightMouse2.setGlowStrength(1) -- optional
 
   local tiles = area.tiles
   for x=2,198 do
@@ -88,10 +88,10 @@ function love.draw()
   love.graphics.print("loaf " .. area.tiles[1][1],0,0,0.5)
   graphics.drawSprite("c0", 32, 256)
   if lightEnable then
-    lightWorld.drawShadow()
     lightWorld2.drawShadow()
+    lightWorld.drawShadow()
 
-    lightWorld.drawShine()
     lightWorld2.drawShine()
+    lightWorld.drawShine()
   end
 end
