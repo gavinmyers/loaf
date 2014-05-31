@@ -1,16 +1,51 @@
 require "lib/postshader"
 require "lib/light"
+require "lib/network"
 require "map"
 require "graphics"
-
-host, port = "127.0.0.1", 9988 
-socket = require("socket")
-tcp = assert(socket.tcp())
-tcp:connect(host, port)
+require "coroutine"
 
 area = nil
 lightWorld = nil
 lightEnable = true
+
+
+-- create a new TCP client socket
+connection = network.tcp.client()
+
+-- this function gets run if the connection is successful
+function connection:on_open()
+    print("Connected")
+
+    connection:send("Ping")
+end
+
+-- this function gets run when the connection is closed
+function connection:on_close()
+    print("Closed")
+
+    love.event.quit()
+
+    -- or you could do:
+    -- print("Connection lost, reconnecting...")
+    -- connection:reconnect()
+    -- print("Reconnected")
+end
+
+-- this function gets run if the socket receives a message (passing the message's data)
+function connection:on_message(msg)
+    print("Received: " .. msg)
+end
+
+-- this function gets run if something bad happens (passing a short message explaining the error)
+function connection:on_error(msg)
+    print("Error: " .. msg)
+
+    love.event.quit()
+end
+
+-- assuming you are running a listening TCP server on this address (see server example)
+connection:connect("127.0.0.1", 9988)
 
 
 function love.load()
@@ -19,14 +54,6 @@ function love.load()
   area = map.create(200,200,map.themes.cave)
   area.batch = graphics.renderMap(area.width,area.height,area.tiles)
   light()
-
-
-  --while false do
-  --    local s, status, partial = tcp:receive()
-  --    print(s or partial)
-  --    if status == "closed" then break end
-  --end
-  --tcp:close()
 end
 
 function light() 
@@ -73,7 +100,6 @@ function light()
       end
     end
   end
-
 end
 
 function love.keypressed(key)
@@ -81,12 +107,9 @@ function love.keypressed(key)
     love.event.quit()
   elseif key == "l" then
 
-    tcp:send('{"token":"love2d20","action":"connect"}\r\n')
-    tcp:send('{"token":"love2d_t1","action":"connect"}\r\n')
-    tcp:send('{"token":"love2d_t2","action":"connect","data":false}\r\n')
-    tcp:send('{"token":"love2d_t3","action":"connect","data":null}\r\n')
-    tcp:send('{"token":"love2d_t4","action":"connect","data":""}\r\n')
-    tcp:send('{"token":"love2d_t4","action":"disconnect","data":""}\r\n')
+    --tcp:send('
+    --tcp:send('{"token":"love2d_t4","action":"disconnect","data":""}\r\n')
+    connection:send('{"token":"love2d20","action":"connect"}\r\n')
 
     lightEnable = lightEnable == false
   elseif key == " " then
@@ -97,6 +120,7 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+  connection:update()
   lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
   lightMouse2.setPosition(love.mouse.getX(), love.mouse.getY())
 end
