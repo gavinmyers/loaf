@@ -3,9 +3,15 @@ require "lib/light"
 require "map"
 require "graphics"
 
+host, port = "127.0.0.1", 9988 
+socket = require("socket")
+tcp = assert(socket.tcp())
+tcp:connect(host, port)
+
 area = nil
 lightWorld = nil
 lightEnable = true
+
 
 function love.load()
   math.randomseed(os.time())
@@ -13,12 +19,20 @@ function love.load()
   area = map.create(200,200,map.themes.cave)
   area.batch = graphics.renderMap(area.width,area.height,area.tiles)
   light()
+
+
+  --while false do
+  --    local s, status, partial = tcp:receive()
+  --    print(s or partial)
+  --    if status == "closed" then break end
+  --end
+  --tcp:close()
 end
 
 function light() 
   lightWorld = love.light.newWorld()
-  lightWorld.setAmbientColor(40, 40, 40) -- optional
-  lightMouse = lightWorld.newLight(0, 0, 255, 255, 255, 300)
+  lightWorld.setAmbientColor(0, 0, 0) -- optional
+  lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
   lightMouse.setGlowStrength(1) -- optional
 
   lightWorld2 = love.light.newWorld()
@@ -66,6 +80,14 @@ function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
   elseif key == "l" then
+
+    tcp:send('{"token":"love2d20","action":"connect"}\r\n')
+    tcp:send('{"token":"love2d_t1","action":"connect"}\r\n')
+    tcp:send('{"token":"love2d_t2","action":"connect","data":false}\r\n')
+    tcp:send('{"token":"love2d_t3","action":"connect","data":null}\r\n')
+    tcp:send('{"token":"love2d_t4","action":"connect","data":""}\r\n')
+    tcp:send('{"token":"love2d_t4","action":"disconnect","data":""}\r\n')
+
     lightEnable = lightEnable == false
   elseif key == " " then
     area = map.create(200,200,map.themes.cave)
