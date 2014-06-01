@@ -8,6 +8,7 @@ require "coroutine"
 area = nil
 lightWorld = nil
 lightEnable = true
+token = "ac709186-85ec-4478-8355-f079ddcd8f22"
 
 
 -- create a new TCP client socket
@@ -16,16 +17,13 @@ connection = network.tcp.client()
 -- this function gets run if the connection is successful
 function connection:on_open()
     print("Connected")
-
-    connection:send("Ping")
+    --connection:send("Ping")
 end
 
 -- this function gets run when the connection is closed
 function connection:on_close()
     print("Closed")
-
     love.event.quit()
-
     -- or you could do:
     -- print("Connection lost, reconnecting...")
     -- connection:reconnect()
@@ -34,21 +32,21 @@ end
 
 -- this function gets run if the socket receives a message (passing the message's data)
 function connection:on_message(msg)
-    print("Received: " .. msg)
+    --print("Received: " .. msg)
 end
 
 -- this function gets run if something bad happens (passing a short message explaining the error)
 function connection:on_error(msg)
     print("Error: " .. msg)
-
     love.event.quit()
 end
 
--- assuming you are running a listening TCP server on this address (see server example)
-connection:connect("127.0.0.1", 9988)
-
-
 function love.load()
+  connection:connect("127.0.0.1", 9988)
+  --log in
+  connection:send('{"token":"'..token..'","action":"connect"}\r\n')
+  --generate map (move current map.create to go)
+  connection:send('{"token":"'..token..'","action":"map"}\r\n')
   math.randomseed(os.time())
   graphics.init()
   area = map.create(200,200,map.themes.cave)
@@ -106,11 +104,6 @@ function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
   elseif key == "l" then
-
-    --tcp:send('
-    --tcp:send('{"token":"love2d_t4","action":"disconnect","data":""}\r\n')
-    connection:send('{"token":"love2d20","action":"connect"}\r\n')
-
     lightEnable = lightEnable == false
   elseif key == " " then
     area = map.create(200,200,map.themes.cave)
