@@ -104,6 +104,7 @@ function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
   elseif key == "l" then
+    connection:send('{"token":"'..token..'","action":"ack"}\r\n')
     lightEnable = lightEnable == false
   elseif key == " " then
     area = map.create(200,200,map.themes.cave)
