@@ -1,9 +1,12 @@
 require "lib/postshader"
 require "lib/light"
 require "lib/network"
+require "lib/json"
 require "map"
 require "graphics"
 require "coroutine"
+
+local inspect = require "lib/inspect"
 
 area = nil
 lightWorld = nil
@@ -32,7 +35,11 @@ end
 
 -- this function gets run if the socket receives a message (passing the message's data)
 function connection:on_message(msg)
-    --print("Received: " .. msg)
+  
+  local jsn = json.decode(msg)
+  if jsn.Action ~= nil then
+    print(jsn.Token .. '[' .. jsn.Action .. ']')
+  end
 end
 
 -- this function gets run if something bad happens (passing a short message explaining the error)
