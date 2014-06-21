@@ -1,52 +1,19 @@
 require "lib/postshader"
 require "lib/light"
-require "lib/network"
 require "lib/json"
 require "map"
+require "thing"
+require "client"
 require "graphics"
 require "coroutine"
 
 local inspect = require "lib/inspect"
 
+player = Player:new{x=100,y=100,sprite="c0"}
 area = nil
 lightWorld = nil
 lightEnable = true
-token = "ac709186-85ec-4478-8355-f079ddcd8f22"
-
-
--- create a new TCP client socket
-connection = network.tcp.client()
-
--- this function gets run if the connection is successful
-function connection:on_open()
-    print("Connected")
-    --connection:send("Ping")
-end
-
--- this function gets run when the connection is closed
-function connection:on_close()
-    print("Closed")
-    love.event.quit()
-    -- or you could do:
-    -- print("Connection lost, reconnecting...")
-    -- connection:reconnect()
-    -- print("Reconnected")
-end
-
--- this function gets run if the socket receives a message (passing the message's data)
-function connection:on_message(msg)
-  
-  local jsn = json.decode(msg)
-  if jsn.Action ~= nil then
-    print(jsn.Token .. '[' .. jsn.Action .. ']')
-  end
-end
-
--- this function gets run if something bad happens (passing a short message explaining the error)
-function connection:on_error(msg)
-    print("Error: " .. msg)
-    love.event.quit()
-end
+math.randomseed(os.time())
 
 function love.load()
   connection:connect("127.0.0.1", 9988)
@@ -54,14 +21,13 @@ function love.load()
   connection:send('{"token":"'..token..'","action":"connect"}\r\n')
   --generate map (move current map.create to go)
   connection:send('{"token":"'..token..'","action":"map"}\r\n')
-  math.randomseed(os.time())
   graphics.init()
   area = map.create(200,200,map.themes.cave)
   area.batch = graphics.renderMap(area.width,area.height,area.tiles)
-  light()
+  lightPlayer()
 end
 
-function light() 
+function lightPlayer() 
   lightWorld = love.light.newWorld()
   lightWorld.setAmbientColor(0, 0, 0) -- optional
   lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
@@ -110,20 +76,30 @@ end
 function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
+  elseif key == "w" then
+    player.y = player.y - 16
+  elseif key == "s" then
+    player.y = player.y + 16
+  elseif key == "a" then
+    player.x = player.x - 16
+  elseif key == "d" then
+    player.x = player.x + 16
   elseif key == "l" then
     connection:send('{"token":"'..token..'","action":"ack"}\r\n')
     lightEnable = lightEnable == false
   elseif key == " " then
     area = map.create(200,200,map.themes.cave)
     area.batch = graphics.renderMap(area.width,area.height,area.tiles)
-    light()
+    lightPlayer()
   end
 end
 
 function love.update(dt)
   connection:update()
-  lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
-  lightMouse2.setPosition(love.mouse.getX(), love.mouse.getY())
+  --lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
+  --lightMouse2.setPosition(love.mouse.getX(), love.mouse.getY())
+  lightMouse.setPosition(player.x+8, player.y+8) 
+  lightMouse2.setPosition(player.x+8, player.y+8) 
 end
 
 function love.draw()
@@ -133,11 +109,10 @@ function love.draw()
   end
   love.graphics.draw(area.batch,0,0,0,1)
   love.graphics.print("loaf " .. area.tiles[1][1],0,0,0.5)
-  graphics.drawSprite("c0", 32, 256)
+  graphics.drawThing(player)
   if lightEnable then
     lightWorld2.drawShadow()
     lightWorld.drawShadow()
-
     lightWorld2.drawShine()
     lightWorld.drawShine()
   end

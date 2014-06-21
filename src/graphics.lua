@@ -1,4 +1,5 @@
 require "map"
+require "thing"
 
 graphics = {}
 graphics.sprites = {}
@@ -32,6 +33,10 @@ function graphics.init()
   local c0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
   graphics.sprites["c0"] = {sprite=player0,quad=c0}
 
+end
+
+function graphics.drawThing(t) 
+  graphics.drawSprite(t.sprite,t.x,t.y)
 end
 
 function graphics.drawSprite(k,x,y) 

@@ -1,5 +1,6 @@
 map = {}
 map.themes = {}
+
 function map.create(w,h,theme) 
   if theme == nil then
     theme = map.themes.default
@@ -10,8 +11,7 @@ function map.create(w,h,theme)
   mapinst.tiles = theme(w,h) 
   return mapinst
 end
--- 0-8 free 
--- 9-16 full 
+
 map.types = {
   void={0},
   free={1,2,3,4,5,6,7,8},
