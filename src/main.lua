@@ -9,7 +9,7 @@ require "coroutine"
 
 local inspect = require "lib/inspect"
 
-player = Player:new{x=100,y=100,sprite="c0"}
+player = Player:new{x=96,y=96,sprite="c0"}
 area = nil
 lightWorld = nil
 lightEnable = true
@@ -74,16 +74,34 @@ function lightPlayer()
 end
 
 function love.keypressed(key)
+  local tx = player.x / 16
+  local ty = player.y / 16
   if key == "escape" then
     love.event.quit()
   elseif key == "w" then
-    player.y = player.y - 16
+    local v = area.tiles[tx][ty-1]
+    local t = map.types.source(v) 
+    if(t == map.types.free) then
+      player.y = player.y - 16
+    end
   elseif key == "s" then
-    player.y = player.y + 16
+    local v = area.tiles[tx][ty+1]
+    local t = map.types.source(v) 
+    if(t == map.types.free) then
+      player.y = player.y + 16
+    end
   elseif key == "a" then
-    player.x = player.x - 16
+    local v = area.tiles[tx-1][ty]
+    local t = map.types.source(v) 
+    if(t == map.types.free) then
+      player.x = player.x - 16
+    end
   elseif key == "d" then
-    player.x = player.x + 16
+    local v = area.tiles[tx+1][ty]
+    local t = map.types.source(v) 
+    if(t == map.types.free) then
+      player.x = player.x + 16
+    end
   elseif key == "l" then
     connection:send('{"token":"'..token..'","action":"ack"}\r\n')
     lightEnable = lightEnable == false
