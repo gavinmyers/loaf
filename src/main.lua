@@ -5,7 +5,6 @@ require "map"
 require "thing"
 require "client"
 require "graphics"
-require "coroutine"
 
 local inspect = require "lib/inspect"
 
