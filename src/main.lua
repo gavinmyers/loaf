@@ -144,8 +144,8 @@ function love.draw()
   love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
   graphics.drawThing(player)
   if lightEnable then
-    lightWorld2.drawShadow(128 + mx, 128 + my)
-    lightWorld.drawShadow(128 + mx, 128 + my)
+    lightWorld2.drawShadow(mx - 128, my - 128)
+    lightWorld.drawShadow(mx - 128, my - 128)
     lightWorld2.drawShine()
     lightWorld.drawShine()
   end
