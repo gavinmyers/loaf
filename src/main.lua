@@ -8,7 +8,7 @@ require "graphics"
 
 local inspect = require "lib/inspect"
 
-player = Player:new{x=96,y=96,sprite="c0"}
+player = Player:new{x=0,y=0,sprite="c0"}
 area = nil
 lightWorld = nil
 lightEnable = true
@@ -23,6 +23,16 @@ function love.load()
   graphics.init()
   area = map.create(200,200,map.themes.cave)
   area.batch = graphics.renderMap(area.width,area.height,area.tiles)
+  for x = 2,area.width do
+    for y = 2,area.height do
+      local v = area.tiles[x][y]
+      local t = map.types.source(v) 
+      if t == map.types.exit then
+        player.x = x * 16
+        player.y = y * 16
+      end
+    end
+  end
   lightPlayer()
 end
 
@@ -120,12 +130,15 @@ function love.update(dt)
 end
 
 function love.draw()
+  local mx = player.x
+  local my = player.y
+  love.graphics.translate(128 + mx * -1,128 + my * -1)
   if lightEnable then
     lightWorld.update()
     lightWorld2.update()
   end
-  love.graphics.draw(area.batch,0,0,0,1)
-  love.graphics.print("loaf " .. area.tiles[1][1],0,0,0.5)
+  love.graphics.draw(area.batch)
+  love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
   graphics.drawThing(player)
   if lightEnable then
     lightWorld2.drawShadow()
