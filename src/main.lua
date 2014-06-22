@@ -38,11 +38,13 @@ end
 
 function lightPlayer() 
   lightWorld = love.light.newWorld()
+  lightWorld.blur = 10.0
   lightWorld.setAmbientColor(0, 0, 0) -- optional
   lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
   lightMouse.setGlowStrength(1) -- optional
 
   lightWorld2 = love.light.newWorld()
+  lightWorld2.blur = 8.0
   lightWorld2.setAmbientColor(180, 180, 180) -- optional
 
   lightMouse2 = lightWorld2.newLight(0, 0, 255, 255, 255, 3000)
@@ -73,9 +75,9 @@ function lightPlayer()
           end
         end
         if tt == 8 then 
-          local r = lightWorld.newRectangle(nx+8,ny+8,16,16) -- (x, y, width, height)
+          local r = lightWorld.newRectangle(nx+8,ny+8,16,16) 
         else
-          local r = lightWorld2.newRectangle(nx+8,ny+8,16,16) -- (x, y, width, height)
+          local r = lightWorld2.newRectangle(nx+8,ny+8,16,16)
         end
       end
     end
@@ -130,10 +132,10 @@ function love.update(dt)
 end
 
 function love.draw()
+  --love.graphics.scale(0.1,0.1)
   local mx = player.x
   local my = player.y
   love.graphics.translate(128 + mx * -1,128 + my * -1)
-
   if lightEnable then
     lightWorld.update()
     lightWorld2.update()
@@ -142,8 +144,8 @@ function love.draw()
   love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
   graphics.drawThing(player)
   if lightEnable then
-    lightWorld2.drawShadow()
-    lightWorld.drawShadow()
+    lightWorld2.drawShadow(128 + mx, 128 + my)
+    lightWorld.drawShadow(128 + mx, 128 + my)
     lightWorld2.drawShine()
     lightWorld.drawShine()
   end
