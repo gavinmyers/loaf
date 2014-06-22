@@ -133,6 +133,7 @@ function love.draw()
   local mx = player.x
   local my = player.y
   love.graphics.translate(128 + mx * -1,128 + my * -1)
+
   if lightEnable then
     lightWorld.update()
     lightWorld2.update()
