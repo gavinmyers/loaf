@@ -146,7 +146,7 @@ function love.draw()
   if lightEnable then
     lightWorld2.drawShadow(mx - 128, my - 128)
     lightWorld.drawShadow(mx - 128, my - 128)
-    lightWorld2.drawShine()
-    lightWorld.drawShine()
+    --lightWorld2.drawShine()
+    --lightWorld.drawShine()
   end
 end
