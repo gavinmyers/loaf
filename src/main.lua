@@ -137,6 +137,8 @@ function love.draw()
   local my = player.y
   love.graphics.translate(128 + mx * -1,128 + my * -1)
   if lightEnable then
+    lightWorld2.drawShadow(mx - 128, my - 128)
+    lightWorld.drawShadow(mx - 128, my - 128)
     lightWorld.update()
     lightWorld2.update()
   end
