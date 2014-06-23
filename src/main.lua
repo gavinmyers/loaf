@@ -136,19 +136,17 @@ function love.draw()
   local mx = player.x
   local my = player.y
   love.graphics.translate(128 + mx * -1,128 + my * -1)
+  love.graphics.draw(area.batch)
   if lightEnable then
     lightWorld2.drawShadow(mx - 128, my - 128)
     lightWorld.drawShadow(mx - 128, my - 128)
     lightWorld.update()
     lightWorld2.update()
-  end
-  love.graphics.draw(area.batch)
-  love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
-  graphics.drawThing(player)
-  if lightEnable then
     lightWorld2.drawShadow(mx - 128, my - 128)
     lightWorld.drawShadow(mx - 128, my - 128)
     --lightWorld2.drawShine()
     --lightWorld.drawShine()
   end
+  graphics.drawThing(player)
+  love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
 end
