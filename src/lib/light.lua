@@ -94,6 +94,11 @@ function love.light.newWorld()
   o.isRefraction = false
   o.isReflection = false
 
+  o.translate = function(trans_x,trans_y)
+    LOVE_LIGHT_TRANSLATE_X = trans_x 
+    LOVE_LIGHT_TRANSLATE_Y = trans_y 
+  end
+
   -- update
   o.update = function()
     LOVE_LIGHT_LAST_BUFFER = love.graphics.getCanvas()
@@ -419,12 +424,10 @@ function love.light.newWorld()
     o.pixelShadow2 = love.graphics.newCanvas()
   end
   -- draw shadow
-  o.drawShadow = function(trans_x, trans_y)
+  o.drawShadow = function()
     if o.optionShadows and (o.isShadows or o.isLight) then
       love.graphics.setColor(255, 255, 255)
       if o.blur then
-        LOVE_LIGHT_TRANSLATE_X = trans_x 
-        LOVE_LIGHT_TRANSLATE_Y = trans_y 
         LOVE_LIGHT_LAST_BUFFER = love.graphics.getCanvas()
         LOVE_LIGHT_BLURV:send("steps", o.blur)
         LOVE_LIGHT_BLURH:send("steps", o.blur)

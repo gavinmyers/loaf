@@ -15,6 +15,7 @@ lightEnable = true
 math.randomseed(os.time())
 
 function love.load()
+  print(inspect(love.graphics))
   connection:connect("127.0.0.1", 9988)
   --log in
   connection:send('{"token":"'..token..'","action":"connect"}\r\n')
@@ -135,15 +136,15 @@ function love.draw()
   --love.graphics.scale(0.1,0.1)
   local mx = player.x
   local my = player.y
-  love.graphics.translate(128 + mx * -1,128 + my * -1)
+  love.graphics.translate(312 + mx * -1,312 + my * -1)
+  lightWorld.translate(mx - 312, my - 312)
+  lightWorld2.translate(mx - 312, my - 312)
   love.graphics.draw(area.batch)
   if lightEnable then
-    lightWorld2.drawShadow(mx - 128, my - 128)
-    lightWorld.drawShadow(mx - 128, my - 128)
     lightWorld.update()
     lightWorld2.update()
-    lightWorld2.drawShadow(mx - 128, my - 128)
-    lightWorld.drawShadow(mx - 128, my - 128)
+    lightWorld2.drawShadow()
+    lightWorld.drawShadow()
     --lightWorld2.drawShine()
     --lightWorld.drawShine()
   end
