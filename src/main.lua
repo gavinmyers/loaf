@@ -12,6 +12,8 @@ player = Player:new{x=0,y=0,sprite="c0"}
 playerMoving = false
 playerMoveToX = 0
 playerMoveToY = 0
+cameraX = 0
+cameraY = 0
 area = nil
 lightWorld = nil
 lightEnable = true
@@ -34,6 +36,10 @@ function love.load()
       if t == map.types.exit then
         player.x = x * 16
         player.y = y * 16
+        local mx = player.x
+        local my = player.y
+        cameraX = 312 + mx * -1 
+        cameraY = 312 + my * -1 
       end
     end
   end
@@ -168,9 +174,17 @@ function love.draw()
   --love.graphics.scale(0.1,0.1)
   local mx = player.x
   local my = player.y
-  love.graphics.translate(312 + mx * -1,312 + my * -1)
-  lightWorld.translate(mx - 312, my - 312)
-  lightWorld2.translate(mx - 312, my - 312)
+  print(cameraX - (312 + mx * -1))
+  print(cameraY - (312 + my * -1))
+  if math.abs(cameraX - (312 + mx * -1)) > 128 
+    or math.abs(cameraY - (312 + my * -1)) > 128 then
+    cameraX = 312 + mx * -1
+    cameraY = 312 + my * -1
+  end
+  love.graphics.translate(cameraX, cameraY)
+  lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
+  lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
+
   love.graphics.draw(area.batch)
   if lightEnable then
     lightWorld.update()
