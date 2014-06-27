@@ -9,6 +9,9 @@ require "graphics"
 local inspect = require "lib/inspect"
 
 player = Player:new{x=0,y=0,sprite="c0"}
+playerMoving = false
+playerMoveToX = 0
+playerMoveToY = 0
 area = nil
 lightWorld = nil
 lightEnable = true
@@ -86,6 +89,10 @@ function lightPlayer()
 end
 
 function love.keypressed(key)
+  if playerMoving then
+    return
+  end
+
   local tx = player.x / 16
   local ty = player.y / 16
   if key == "escape" then
@@ -94,25 +101,33 @@ function love.keypressed(key)
     local v = area.tiles[tx][ty-1]
     local t = map.types.source(v) 
     if(t == map.types.free) then
-      player.y = player.y - 16
+      playerMoving = true
+      playerMoveToX = player.x
+      playerMoveToY = player.y - 16
     end
   elseif key == "s" then
     local v = area.tiles[tx][ty+1]
     local t = map.types.source(v) 
     if(t == map.types.free) then
-      player.y = player.y + 16
+      playerMoving = true
+      playerMoveToX = player.x
+      playerMoveToY = player.y + 16
     end
   elseif key == "a" then
     local v = area.tiles[tx-1][ty]
     local t = map.types.source(v) 
     if(t == map.types.free) then
-      player.x = player.x - 16
+      playerMoving = true
+      playerMoveToY = player.y
+      playerMoveToX = player.x - 16
     end
   elseif key == "d" then
     local v = area.tiles[tx+1][ty]
     local t = map.types.source(v) 
     if(t == map.types.free) then
-      player.x = player.x + 16
+      playerMoving = true
+      playerMoveToY = player.y
+      playerMoveToX = player.x + 16
     end
   elseif key == "l" then
     connection:send('{"token":"'..token..'","action":"ack"}\r\n')
@@ -125,6 +140,23 @@ function love.keypressed(key)
 end
 
 function love.update(dt)
+  local playerSpeed = 8 
+  if playerMoving and (player.x ~= playerMoveToX or player.y ~= playerMoveToY) then
+    if player.x > playerMoveToX then
+      player.x = player.x - playerSpeed 
+    elseif player.x < playerMoveToX then
+      player.x = player.x + playerSpeed 
+    end 
+    if player.y > playerMoveToY then
+      player.y = player.y - playerSpeed 
+    elseif player.y < playerMoveToY then
+      player.y = player.y + playerSpeed 
+    end 
+  else 
+    playerMoving = false
+  end
+
+
   connection:update()
   --lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
   --lightMouse2.setPosition(love.mouse.getX(), love.mouse.getY())
