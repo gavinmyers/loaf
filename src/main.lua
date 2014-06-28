@@ -9,10 +9,13 @@ require "graphics"
 local inspect = require "lib/inspect"
 
 player = Player:new{x=0,y=0,sprite="c0"}
+--sceneChange = false
 playerMoving = false
 playerMoveToX = 0
 playerMoveToY = 0
 cameraX = 0
+cameraOffsetX = 392 
+cameraOffsetY = 312 
 cameraY = 0
 area = nil
 lightWorld = nil
@@ -38,12 +41,13 @@ function love.load()
         player.y = y * 16
         local mx = player.x
         local my = player.y
-        cameraX = 312 + mx * -1 
-        cameraY = 312 + my * -1 
+        cameraX = cameraOffsetX + mx * -1 
+        cameraY = cameraOffsetY + my * -1 
       end
     end
   end
   lightPlayer()
+  --sceneChange = true
 end
 
 function lightPlayer() 
@@ -92,6 +96,9 @@ function lightPlayer()
       end
     end
   end
+
+  lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
+  lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
 end
 
 function love.keypressed(key)
@@ -171,19 +178,18 @@ function love.update(dt)
 end
 
 function love.draw()
-  --love.graphics.scale(0.1,0.1)
+    --love.graphics.scale(0.1,0.1)
   local mx = player.x
   local my = player.y
-  print(cameraX - (312 + mx * -1))
-  print(cameraY - (312 + my * -1))
-  if math.abs(cameraX - (312 + mx * -1)) > 128 
-    or math.abs(cameraY - (312 + my * -1)) > 128 then
-    cameraX = 312 + mx * -1
-    cameraY = 312 + my * -1
+  if math.abs(cameraX - (cameraOffsetX + mx * -1)) > 256 
+    or math.abs(cameraY - (cameraOffsetY + my * -1)) > 256 then
+    cameraX = cameraOffsetX + mx * -1
+    cameraY = cameraOffsetY + my * -1
+    --cameraY =  50 + my * -1
+    lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
+    lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
   end
   love.graphics.translate(cameraX, cameraY)
-  lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
-  lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
 
   love.graphics.draw(area.batch)
   if lightEnable then
@@ -191,9 +197,11 @@ function love.draw()
     lightWorld2.update()
     lightWorld2.drawShadow()
     lightWorld.drawShadow()
-    --lightWorld2.drawShine()
-    --lightWorld.drawShine()
   end
   graphics.drawThing(player)
+  love.graphics.rectangle("fill", math.abs(cameraX), math.abs(cameraY), 800, 50)
+  love.graphics.rectangle("fill", math.abs(cameraX), math.abs(cameraY) + 586, 800, 50)
+  love.graphics.rectangle("fill", math.abs(cameraX), math.abs(cameraY) , 140, 800)
+  love.graphics.rectangle("fill", math.abs(cameraX) + 670, math.abs(cameraY) , 140, 800)
   love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
 end
