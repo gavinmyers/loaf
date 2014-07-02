@@ -8,7 +8,7 @@ function map.create(w,h,theme)
   local mapinst = {}
   mapinst.width = w
   mapinst.height = h
-  mapinst.tiles = theme(w,h) 
+  mapinst.tiles = theme(w + 4,h + 4) 
   return mapinst
 end
 
@@ -68,7 +68,7 @@ function map.themes.cave(w,h)
     end
   end
   --average out the colors
-  for i=1,3 do
+  for i=1,1 do
     for x=2,w-2 do
       for y=2,h-2 do
         local s = tiles[x][y]

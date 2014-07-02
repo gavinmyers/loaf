@@ -30,8 +30,9 @@ function love.load()
   --generate map (move current map.create to go)
   connection:send('{"token":"'..token..'","action":"map"}\r\n')
   graphics.init()
-  area = map.create(200,200,map.themes.cave)
+  area = map.create(100,100,map.themes.cave)
   area.batch = graphics.renderMap(area.width,area.height,area.tiles)
+  print(area.width .. " by " .. area.height)
   for x = 2,area.width do
     for y = 2,area.height do
       local v = area.tiles[x][y]
@@ -65,8 +66,8 @@ function lightPlayer()
   lightMouse2.setGlowStrength(1) -- optional
 
   local tiles = area.tiles
-  for x=2,198 do
-    for y=2,198 do
+  for x=2,area.width do
+    for y=2,area.height do
       local et = area.tiles[x][y]
       local t = map.types.source(et)
       if t == map.types.full then
@@ -146,14 +147,14 @@ function love.keypressed(key)
     connection:send('{"token":"'..token..'","action":"ack"}\r\n')
     lightEnable = lightEnable == false
   elseif key == " " then
-    area = map.create(200,200,map.themes.cave)
+    area = map.create(100,100,map.themes.cave)
     area.batch = graphics.renderMap(area.width,area.height,area.tiles)
     lightPlayer()
   end
 end
 
 function love.update(dt)
-  local playerSpeed = 8 
+  local playerSpeed = 4 
   if playerMoving and (player.x ~= playerMoveToX or player.y ~= playerMoveToY) then
     if player.x > playerMoveToX then
       player.x = player.x - playerSpeed 
@@ -183,8 +184,19 @@ function love.draw()
   local my = player.y
   if math.abs(cameraX - (cameraOffsetX + mx * -1)) > 256 
     or math.abs(cameraY - (cameraOffsetY + my * -1)) > 256 then
-    cameraX = cameraOffsetX + mx * -1
-    cameraY = cameraOffsetY + my * -1
+    local addOffsetX = (cameraX - (cameraOffsetX + mx * -1))
+    local addOffsetY = (cameraY - (cameraOffsetY + my * -1))
+    addOffsetX = 0
+    addOffsetY = 0
+    cameraX = cameraOffsetX + addOffsetX + mx * -1
+    cameraY = cameraOffsetY + addOffsetY + my * -1
+    if(cameraX > 0) then
+      cameraX = 0
+    end
+    if(cameraY > 0) then
+      cameraY = 0
+    end
+    --cameraX =  50 - mx
     --cameraY =  50 + my * -1
     lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
     lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
