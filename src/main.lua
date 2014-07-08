@@ -24,11 +24,11 @@ math.randomseed(os.time())
 
 function love.load()
   print(inspect(love.graphics))
-  connection:connect("127.0.0.1", 9988)
+  --connection:connect("127.0.0.1", 9988)
   --log in
-  connection:send('{"token":"'..token..'","action":"connect"}\r\n')
+  --connection:send('{"token":"'..token..'","action":"connect"}\r\n')
   --generate map (move current map.create to go)
-  connection:send('{"token":"'..token..'","action":"map"}\r\n')
+  --connection:send('{"token":"'..token..'","action":"map"}\r\n')
   graphics.init()
   area = map.create(100,100,map.themes.cave)
   area.batch = graphics.renderMap(area.width,area.height,area.tiles)
@@ -144,7 +144,7 @@ function love.keypressed(key)
       playerMoveToX = player.x + 16
     end
   elseif key == "l" then
-    connection:send('{"token":"'..token..'","action":"ack"}\r\n')
+    --connection:send('{"token":"'..token..'","action":"ack"}\r\n')
     lightEnable = lightEnable == false
   elseif key == " " then
     area = map.create(100,100,map.themes.cave)
@@ -171,7 +171,7 @@ function love.update(dt)
   end
 
 
-  connection:update()
+  --connection:update()
   --lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
   --lightMouse2.setPosition(love.mouse.getX(), love.mouse.getY())
   lightMouse.setPosition(player.x+8, player.y+8) 
