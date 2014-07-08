@@ -21,14 +21,20 @@ function graphics.init()
   graphics.sprites["g0"] = {sprite=floor,quad=g0}
 
   graphics.tile.buildSet(224,48,"DESERTROCK_",floor)
-
-  local DESERTROCK_FP = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
-  graphics.sprites["DESERTROCK_FP"] = {sprite=floor,quad=DESERTROCK_FP}
+  local g = love.graphics.newQuad(16, 256, 16, 16, 336, 624)
+  graphics.sprites["DESERTROCK_FP"] = {sprite=floor,quad=g}
 
   graphics.tile.buildSet(224,240,"DESERTSNOW_",floor)
+  local g = love.graphics.newQuad(256, 256, 16, 16, 336, 624)
+  graphics.sprites["DESERTSNOW_FP"] = {sprite=floor,quad=g}
 
-  local g3 = love.graphics.newQuad(256, 256, 16, 16, 336, 624)
-  graphics.sprites["g3"] = {sprite=floor,quad=g3}
+  graphics.tile.buildSet(112,240,"DESERTBRICK_",floor)
+  local g = love.graphics.newQuad(256, 16, 16, 16, 336, 624)
+  graphics.sprites["DESERTBRICK_FP"] = {sprite=floor,quad=g}
+
+  graphics.tile.buildSet(0,240,"DESERTDIRT_",floor)
+  local g = love.graphics.newQuad(256, 16, 16, 16, 336, 624)
+  graphics.sprites["DESERTDIRT_FP"] = {sprite=floor,quad=g}
 
   local c0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
   graphics.sprites["c0"] = {sprite=player0,quad=c0}
@@ -103,12 +109,12 @@ function graphics.renderMap(w,h,m)
         if v == pri then
           s = "DESERTROCK_" .. typ
         elseif v == sec then
-          s = "DESERTSNOW_" .. typ
+          s = "DESERTBRICK_" .. typ
         end
       elseif t == map.types.exit then
-        s = "g3"
+        s = "g0"
       else
-        s = "DESERTROCK_FP"
+        s = "DESERTSNOW_" .. typ
       end
       local q = graphics.sprites[s].quad
       b:add(q,x*16,y*16)
