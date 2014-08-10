@@ -199,6 +199,13 @@ function love.load()
 end
 
 function love.keypressed(key)
+  if key == "escape" then
+    love.event.quit()
+  elseif key == "w" then
+  elseif key == "a" then
+  elseif key == "s" then
+  elseif key == "d" then
+  end
 end
 
 function love.update(dt)
