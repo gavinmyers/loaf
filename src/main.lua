@@ -1,6 +1,8 @@
 local inspect = require "lib/inspect"
 require "resources/DawnLike_1/Objects/Floor"
+require "resources/DawnLike_1/Objects/Tile"
 require "resources/DawnLike_1/Objects/Wall"
+require "resources/DawnLike_1/Characters/Player"
 math.randomseed(os.time())
 
 tile = {}
@@ -20,30 +22,28 @@ win = {}
 win.w = tile.sz * (tile.acs + 1) 
 win.h = tile.sz * (tile.dwn + 1) 
 
-sprite = {}
-
 function love.load()
   love.graphics.setDefaultFilter("nearest","nearest")
   love.window.setMode(win.w, win.h)
 
-  local ci  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
-  local cq = love.graphics.newQuad(16, 48, 16, 16, 128, 224)
-  defaultCharacterTile = tile.create(ci,cq)
-
-  local ti  = love.graphics.newImage("resources/DawnLike_1/Objects/Tile.png")
-  local tq = love.graphics.newQuad(32, 32, 16, 16, 128, 64)
-  defaultFloorTile = tile.create(ti,tq)
-
   floorTiles = resources.floor()
   wallTiles = resources.wall()
+  gameTiles = resources.tile()
+  playerTiles = resources.player()
 
-  floor = {}
+  map = {}
+  map.floor = {}
+  map.structure = {}
+  map.things = {}
   for x = 0, tile.acs do
-    floor[x] = {}
-    for y = 0, tile.dwn do
-      floor[x][y] = floorTiles[3]["NSEW"]
-    end
+    map.floor[x] = {}
+    map.structure[x] = {}
+    map.things[x] = {}
+--    for y = 0, tile.dwn do
+--      map.floor[x][y] = floorTiles[1]["NSEW"]
+--    end
   end
+  map.things[13][13] = playerTiles[1] 
 
 end
 
@@ -56,8 +56,16 @@ end
 function love.draw()
   for x = 0, tile.acs do
     for y = 0, tile.dwn do
-      tile.graphics.draw(defaultFloorTile,x,y)
-      tile.graphics.draw(floor[x][y],x,y)
+      tile.graphics.draw(gameTiles[1],x,y)
+      if map.floor[x] ~= nil and map.floor[x][y] ~= nil then
+        tile.graphics.draw(map.floor[x][y],x,y)
+      end
+      if map.structure[x] ~= nil and map.structure[x][y] ~= nil then
+        tile.graphics.draw(map.structure[x][y],x,y)
+      end
+      if map.things[x] ~= nil and map.things[x][y] ~= nil then
+        tile.graphics.draw(map.things[x][y],x,y)
+      end
     end
   end
 
@@ -69,7 +77,7 @@ function love.draw()
     tile.graphics.draw(floorTiles[1]["NSW"],0,x)
     tile.graphics.draw(floorTiles[1]["NSE"],tile.acs,x)
   end
-  tile.graphics.draw(defaultCharacterTile, 13, 13)
+
 
   love.graphics.draw(floorTiles[2]["SE"].sprite, floorTiles[2]["SE"].quad,2 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
   love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,3 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
@@ -156,6 +164,4 @@ function love.draw()
   love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
   love.graphics.draw(wallTiles[1]["NE"].sprite, wallTiles[1]["NE"].quad,1 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
   love.graphics.draw(wallTiles[1]["NW"].sprite, wallTiles[1]["NW"].quad,9 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-
-
 end
