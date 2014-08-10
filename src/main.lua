@@ -24,6 +24,65 @@ win.h = tile.sz * (tile.dwn + 2)
 
 generators = {}
 
+function generators.edges(m,x,y)
+  local eN, eS, eE, eW = nil
+  eN = m[x][y-1] 
+  eS = m[x][y+1] 
+
+  if m[x+1] ~= nil then
+    eE = m[x+1][y] 
+  end
+
+  if m[x-1] ~= nil then
+    eW = m[x-1][y] 
+  end
+
+  local eX = m[x][y] 
+
+  if eN ~= nil and eS ~= nil and eE ~= nil and eW ~= nil then 
+    return "NSEW"
+
+  elseif eN == nil and eS == nil and eE == nil and eW == nil then 
+    return ""
+
+  elseif eN ~= nil and eS == nil and eE == nil and eW == nil then 
+    return "N"
+  elseif eN == nil and eS ~= nil and eE == nil and eW == nil then 
+    return "S"
+  elseif eN == nil and eS == nil and eE ~= nil and eW == nil then 
+    return "E"
+  elseif eN == nil and eS == nil and eE == nil and eW ~= nil then 
+    return "W"
+
+  elseif eN ~= nil and eS ~= nil and eE == nil and eW == nil then 
+    return "NS"
+
+  elseif eN ~= nil and eS == nil and eE ~= nil and eW == nil then 
+    return "NE"
+  elseif eN ~= nil and eS == nil and eE == nil and eW ~= nil then 
+    return "NW"
+
+  elseif eN == nil and eS ~= nil and eE ~= nil and eW == nil then 
+    return "SE"
+  elseif eN == nil and eS ~= nil and eE == nil and eW ~= nil then 
+    return "SW"
+
+  elseif eN == nil and eS == nil and eE ~= nil and eW ~= nil then 
+    return "EW"
+
+  elseif eN ~= nil and eS ~= nil and eE ~= nil and eW == nil then 
+    return "NSE"
+  elseif eN ~= nil and eS ~= nil and eE == nil and eW ~= nil then 
+    return "NSW"
+
+  elseif eN ~= nil and eS == nil and eE ~= nil and eW ~= nil then 
+    return "NEW"
+  elseif eN == nil and eS ~= nil and eE ~= nil and eW ~= nil then 
+    return "SEW"
+  end
+  
+  return ""
+end
 -- should be a complete (if boring) map
 function generators.simple() 
   local m = {} 
@@ -33,7 +92,7 @@ function generators.simple()
       if x > 1 and x < tile.acs and y > 1 and y < tile.dwn and x % 2 == 1 and y % 2 == 1 and math.random(1,6) == 6 then
         m[x][y] = nil 
       else
-        m[x][y] = wallTiles[1]["NS"]
+        m[x][y] = 1 
       end
     end
   end
@@ -102,10 +161,18 @@ function generators.simple()
   end
   ex = cx
   ey = cy
-  m[ex][ey] = wallTiles[1]["EW"]
-  m[sx][sy] = wallTiles[1]["EW"]
   map.things[sx][sy] = playerTiles[1] 
 
+  for x = 1, tile.acs do
+    for y = 1, tile.dwn do
+      if m[x][y] ~= nil then
+        m[x][y] = wallTiles[1][generators.edges(m,x,y)]
+      end
+    end
+  end
+
+  m[ex][ey] = wallTiles[1]["EW"]
+  m[sx][sy] = wallTiles[1]["EW"]
   return m
 end
 
