@@ -36,9 +36,14 @@ function graphics.init()
   local g = love.graphics.newQuad(256, 16, 16, 16, 336, 624)
   graphics.sprites["DESERTDIRT_FP"] = {sprite=floor,quad=g}
 
-  local c0 = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
-  graphics.sprites["c0"] = {sprite=player0,quad=c0}
+  local c = love.graphics.newQuad(0, 0, 16, 16, 128, 224)
+  graphics.sprites["MONSTER_001"] = {sprite=player0,quad=c}
 
+  local c = love.graphics.newQuad(16, 0, 16, 16, 128, 224)
+  graphics.sprites["MONSTER_002"] = {sprite=player0,quad=c}
+
+  local c = love.graphics.newQuad(32, 0, 16, 16, 128, 224)
+  graphics.sprites["MONSTER_003"] = {sprite=player0,quad=c}
 end
 
 function graphics.drawThing(t) 

@@ -1,219 +1,161 @@
-require "lib/postshader"
-require "lib/light"
-require "lib/json"
-require "map"
-require "thing"
-require "client"
-require "graphics"
-
 local inspect = require "lib/inspect"
-
-player = Player:new{x=0,y=0,sprite="c0"}
---sceneChange = false
-playerMoving = false
-playerMoveToX = 0
-playerMoveToY = 0
-cameraX = 0
-cameraOffsetX = 392 
-cameraOffsetY = 312 
-cameraY = 0
-area = nil
-lightWorld = nil
-lightEnable = true
+require "resources/DawnLike_1/Objects/Floor"
+require "resources/DawnLike_1/Objects/Wall"
 math.randomseed(os.time())
 
-function love.load()
-  print(inspect(love.graphics))
-  --connection:connect("127.0.0.1", 9988)
-  --log in
-  --connection:send('{"token":"'..token..'","action":"connect"}\r\n')
-  --generate map (move current map.create to go)
-  --connection:send('{"token":"'..token..'","action":"map"}\r\n')
-  graphics.init()
-  area = map.create(100,100,map.themes.cave)
-  area.batch = graphics.renderMap(area.width,area.height,area.tiles)
-  print(area.width .. " by " .. area.height)
-  for x = 2,area.width do
-    for y = 2,area.height do
-      local v = area.tiles[x][y]
-      local t = map.types.source(v) 
-      if t == map.types.exit then
-        player.x = x * 16
-        player.y = y * 16
-        local mx = player.x
-        local my = player.y
-        cameraX = cameraOffsetX + mx * -1 
-        cameraY = cameraOffsetY + my * -1 
-      end
-    end
-  end
-  lightPlayer()
-  --sceneChange = true
+tile = {}
+tile.sz = 16 
+tile.acs = 44 
+tile.dwn = 44 
+tile.mdf = 1
+function tile.create(img,q) 
+  return {sprite=img,quad=q}
+end
+tile.graphics = {}
+function tile.graphics.draw(t,x,y) 
+  love.graphics.draw(t.sprite,t.quad,x*tile.sz,y*tile.sz,0,tile.mdf,tile.mdf)
 end
 
-function lightPlayer() 
-  lightWorld = love.light.newWorld()
-  lightWorld.blur = 10.0
-  lightWorld.setAmbientColor(0, 0, 0) -- optional
-  lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
-  lightMouse.setGlowStrength(1) -- optional
+win = {}
+win.w = tile.sz * (tile.acs + 1) 
+win.h = tile.sz * (tile.dwn + 1) 
 
-  lightWorld2 = love.light.newWorld()
-  lightWorld2.blur = 8.0
-  lightWorld2.setAmbientColor(180, 180, 180) -- optional
+sprite = {}
 
-  lightMouse2 = lightWorld2.newLight(0, 0, 255, 255, 255, 3000)
-  lightMouse2.setGlowStrength(1) -- optional
+function love.load()
+  love.graphics.setDefaultFilter("nearest","nearest")
+  love.window.setMode(win.w, win.h)
 
-  local tiles = area.tiles
-  for x=2,area.width do
-    for y=2,area.height do
-      local et = area.tiles[x][y]
-      local t = map.types.source(et)
-      if t == map.types.full then
-        local nx = 16 * x
-        local ny = 16 * y
+  local ci  = love.graphics.newImage("resources/DawnLike_1/Characters/Player0.png")
+  local cq = love.graphics.newQuad(16, 48, 16, 16, 128, 224)
+  defaultCharacterTile = tile.create(ci,cq)
 
-        local e1 = map.types.source(tiles[x-1][y-1]) 
-        local e2 = map.types.source(tiles[x-1][y]) 
-        local e3 = map.types.source(tiles[x-1][y+1])
-        local e4 = map.types.source(tiles[x][y-1]) 
-        local e5 = map.types.source(tiles[x][y+1]) 
-        local e6 = map.types.source(tiles[x+1][y-1]) 
-        local e7 = map.types.source(tiles[x+1][y]) 
-        local e8 = map.types.source(tiles[x+1][y+1]) 
-        local es = {e1,e2,e3,e4,e5,e6,e7,e8}
-        local tt = 0
-        for i, v in ipairs(es) do
-          if v == map.types.full then
-            tt = tt + 1
-          end
-        end
-        if tt == 8 then 
-          local r = lightWorld.newRectangle(nx+8,ny+8,16,16) 
-        else
-          local r = lightWorld2.newRectangle(nx+8,ny+8,16,16)
-        end
-      end
+  local ti  = love.graphics.newImage("resources/DawnLike_1/Objects/Tile.png")
+  local tq = love.graphics.newQuad(32, 32, 16, 16, 128, 64)
+  defaultFloorTile = tile.create(ti,tq)
+
+  floorTiles = resources.floor()
+  wallTiles = resources.wall()
+
+  floor = {}
+  for x = 0, tile.acs do
+    floor[x] = {}
+    for y = 0, tile.dwn do
+      floor[x][y] = floorTiles[3]["NSEW"]
     end
   end
 
-  lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
-  lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
 end
 
 function love.keypressed(key)
-  if playerMoving then
-    return
-  end
-
-  local tx = player.x / 16
-  local ty = player.y / 16
-  if key == "escape" then
-    love.event.quit()
-  elseif key == "w" then
-    local v = area.tiles[tx][ty-1]
-    local t = map.types.source(v) 
-    if(t == map.types.free) then
-      playerMoving = true
-      playerMoveToX = player.x
-      playerMoveToY = player.y - 16
-    end
-  elseif key == "s" then
-    local v = area.tiles[tx][ty+1]
-    local t = map.types.source(v) 
-    if(t == map.types.free) then
-      playerMoving = true
-      playerMoveToX = player.x
-      playerMoveToY = player.y + 16
-    end
-  elseif key == "a" then
-    local v = area.tiles[tx-1][ty]
-    local t = map.types.source(v) 
-    if(t == map.types.free) then
-      playerMoving = true
-      playerMoveToY = player.y
-      playerMoveToX = player.x - 16
-    end
-  elseif key == "d" then
-    local v = area.tiles[tx+1][ty]
-    local t = map.types.source(v) 
-    if(t == map.types.free) then
-      playerMoving = true
-      playerMoveToY = player.y
-      playerMoveToX = player.x + 16
-    end
-  elseif key == "l" then
-    --connection:send('{"token":"'..token..'","action":"ack"}\r\n')
-    lightEnable = lightEnable == false
-  elseif key == " " then
-    area = map.create(100,100,map.themes.cave)
-    area.batch = graphics.renderMap(area.width,area.height,area.tiles)
-    lightPlayer()
-  end
 end
 
 function love.update(dt)
-  local playerSpeed = 4 
-  if playerMoving and (player.x ~= playerMoveToX or player.y ~= playerMoveToY) then
-    if player.x > playerMoveToX then
-      player.x = player.x - playerSpeed 
-    elseif player.x < playerMoveToX then
-      player.x = player.x + playerSpeed 
-    end 
-    if player.y > playerMoveToY then
-      player.y = player.y - playerSpeed 
-    elseif player.y < playerMoveToY then
-      player.y = player.y + playerSpeed 
-    end 
-  else 
-    playerMoving = false
-  end
-
-
-  --connection:update()
-  --lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
-  --lightMouse2.setPosition(love.mouse.getX(), love.mouse.getY())
-  lightMouse.setPosition(player.x+8, player.y+8) 
-  lightMouse2.setPosition(player.x+8, player.y+8) 
 end
 
 function love.draw()
-    --love.graphics.scale(0.1,0.1)
-  local mx = player.x
-  local my = player.y
-  if math.abs(cameraX - (cameraOffsetX + mx * -1)) > 256 
-    or math.abs(cameraY - (cameraOffsetY + my * -1)) > 256 then
-    local addOffsetX = (cameraX - (cameraOffsetX + mx * -1))
-    local addOffsetY = (cameraY - (cameraOffsetY + my * -1))
-    addOffsetX = 0
-    addOffsetY = 0
-    cameraX = cameraOffsetX + addOffsetX + mx * -1
-    cameraY = cameraOffsetY + addOffsetY + my * -1
-    if(cameraX > 0) then
-      cameraX = 0
+  for x = 0, tile.acs do
+    for y = 0, tile.dwn do
+      tile.graphics.draw(defaultFloorTile,x,y)
+      tile.graphics.draw(floor[x][y],x,y)
     end
-    if(cameraY > 0) then
-      cameraY = 0
-    end
-    --cameraX =  50 - mx
-    --cameraY =  50 + my * -1
-    lightWorld.translate(math.abs(cameraX), math.abs(cameraY))
-    lightWorld2.translate(math.abs(cameraX), math.abs(cameraY))
   end
-  love.graphics.translate(cameraX, cameraY)
 
-  love.graphics.draw(area.batch)
-  if lightEnable then
-    lightWorld.update()
-    lightWorld2.update()
-    lightWorld2.drawShadow()
-    lightWorld.drawShadow()
+  for x = 0, tile.acs do
+    tile.graphics.draw(floorTiles[1]["NWE"],x,0,0)
+    tile.graphics.draw(floorTiles[1]["SWE"],x,tile.dwn)
   end
-  graphics.drawThing(player)
-  love.graphics.rectangle("fill", math.abs(cameraX), math.abs(cameraY), 800, 50)
-  love.graphics.rectangle("fill", math.abs(cameraX), math.abs(cameraY) + 586, 800, 50)
-  love.graphics.rectangle("fill", math.abs(cameraX), math.abs(cameraY) , 140, 800)
-  love.graphics.rectangle("fill", math.abs(cameraX) + 670, math.abs(cameraY) , 140, 800)
-  love.graphics.print("loaf " .. player.x .. "," ..player.y,0,0,0)
+  for x = 0, tile.dwn do
+    tile.graphics.draw(floorTiles[1]["NSW"],0,x)
+    tile.graphics.draw(floorTiles[1]["NSE"],tile.acs,x)
+  end
+  tile.graphics.draw(defaultCharacterTile, 13, 13)
+
+  love.graphics.draw(floorTiles[2]["SE"].sprite, floorTiles[2]["SE"].quad,2 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,3 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,4 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,5 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,6 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,7 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["SW"].sprite, floorTiles[2]["SW"].quad,8 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(floorTiles[2]["NE"].sprite, floorTiles[2]["NE"].quad,2 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,3 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,4 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,5 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,6 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,7 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NW"].sprite, floorTiles[2]["NW"].quad,8 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(wallTiles[1]["SE"].sprite, wallTiles[1]["SE"].quad,1 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,2 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,3 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,4 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,5 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,6 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,7 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["SW"].sprite, wallTiles[1]["SW"].quad,9 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,2 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,3 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,4 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,5 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,6 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,7 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["SW"].sprite, wallTiles[1]["SW"].quad,9 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+
+
+
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NE"].sprite, wallTiles[1]["NE"].quad,1 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+  love.graphics.draw(wallTiles[1]["NW"].sprite, wallTiles[1]["NW"].quad,9 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
+
+
 end

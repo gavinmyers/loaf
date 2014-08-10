@@ -7,3 +7,4 @@ function Thing:new (o)
 end
 
 Player = Thing:new()
+Monster = Thing:new()

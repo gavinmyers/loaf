@@ -8,6 +8,15 @@ function map.create(w,h,theme)
   local mapinst = {}
   mapinst.width = w
   mapinst.height = h
+  function mapinst:moveThing(o,x,y)
+  end
+  function mapinst:getThing(x,y)
+    if self.items[x] == nil then
+      return nil
+    end
+    return self.items[x][y]
+  end
+  mapinst.items = {}
   mapinst.tiles = theme(w + 4,h + 4) 
   return mapinst
 end
