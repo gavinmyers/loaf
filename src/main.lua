@@ -19,8 +19,95 @@ function tile.graphics.draw(t,x,y)
 end
 
 win = {}
-win.w = tile.sz * (tile.acs + 1) 
-win.h = tile.sz * (tile.dwn + 1) 
+win.w = tile.sz * (tile.acs + 2) 
+win.h = tile.sz * (tile.dwn + 2) 
+
+generators = {}
+
+-- should be a complete (if boring) map
+function generators.simple() 
+  local m = {} 
+  for x = 1, tile.acs do
+    m[x] = {}
+    for y = 1, tile.dwn do
+      if x > 1 and x < tile.acs and y > 1 and y < tile.dwn and x % 2 == 1 and y % 2 == 1 and math.random(1,6) == 6 then
+        m[x][y] = nil 
+      else
+        m[x][y] = wallTiles[1]["NS"]
+      end
+    end
+  end
+  for p = 1, 4 do
+    for x = 1, tile.acs do
+      for y = 1, tile.dwn do
+        t = m[x][y]
+        if t == nil then 
+          if x > 2 and x < tile.acs - 1 then
+            if math.random(1,6) > 3 then
+              m[x-1][y] = -1 
+            end
+            if math.random(1,6) > 3 then
+              m[x+1][y] = -1 
+            end
+          end
+          if y > 2 and y < tile.dwn - 1 then
+            if math.random(1,6) > 3 then
+              m[x][y-1] = -1 
+            end
+            if math.random(1,6) > 3 then
+              m[x][y+1] = -1 
+            end
+          end
+        end
+       
+      end
+    end
+    for x = 1, tile.acs do
+      for y = 1, tile.dwn do
+        if m[x][y] == -1 then
+          m[x][y] = nil
+        end
+      end
+    end
+  end
+  local sx,sy = nil
+  while sx == nil do 
+    for x = math.random(2,tile.acs/2), tile.acs-1 do
+      for y = math.random(2,tile.dwn/2), tile.dwn-1 do
+        if m[x][y] == nil and sx == nil and math.random(1,256) == 1 then
+          sx = x
+          sy = y
+        end
+      end
+    end
+  end
+  local path = false
+  local cx = sx
+  local cy = sy
+  local ex, ey = nil
+  while path == false do
+    if math.random(1,3) == 1 and cx > 2 then 
+      cx = cx - 1
+    elseif math.random(1,3) == 1 and cx < tile.acs - 1 then 
+      cx = cx + 1
+    elseif math.random(1,3) == 1 and cy > 2 then 
+      cy = cy - 1
+    elseif math.random(1,3) == 1 and cy < tile.dwn - 1 then 
+      cy = cy + 1
+    end
+    m[cx][cy] = nil
+    if math.random(1,2048) == 1 then
+      path = true
+    end
+  end
+  ex = cx
+  ey = cy
+  m[ex][ey] = wallTiles[1]["EW"]
+  m[sx][sy] = wallTiles[1]["EW"]
+  map.things[sx][sy] = playerTiles[1] 
+
+  return m
+end
 
 function love.load()
   love.graphics.setDefaultFilter("nearest","nearest")
@@ -35,15 +122,12 @@ function love.load()
   map.floor = {}
   map.structure = {}
   map.things = {}
-  for x = 0, tile.acs do
+  for x = 1, tile.acs do
     map.floor[x] = {}
     map.structure[x] = {}
     map.things[x] = {}
---    for y = 0, tile.dwn do
---      map.floor[x][y] = floorTiles[1]["NSEW"]
---    end
   end
-  map.things[13][13] = playerTiles[1] 
+  map.structure = generators.simple()
 
 end
 
@@ -54,8 +138,8 @@ function love.update(dt)
 end
 
 function love.draw()
-  for x = 0, tile.acs do
-    for y = 0, tile.dwn do
+  for x = 1, tile.acs do
+    for y = 1, tile.dwn do
       tile.graphics.draw(gameTiles[1],x,y)
       if map.floor[x] ~= nil and map.floor[x][y] ~= nil then
         tile.graphics.draw(map.floor[x][y],x,y)
@@ -68,100 +152,4 @@ function love.draw()
       end
     end
   end
-
-  for x = 0, tile.acs do
-    tile.graphics.draw(floorTiles[1]["NWE"],x,0,0)
-    tile.graphics.draw(floorTiles[1]["SWE"],x,tile.dwn)
-  end
-  for x = 0, tile.dwn do
-    tile.graphics.draw(floorTiles[1]["NSW"],0,x)
-    tile.graphics.draw(floorTiles[1]["NSE"],tile.acs,x)
-  end
-
-
-  love.graphics.draw(floorTiles[2]["SE"].sprite, floorTiles[2]["SE"].quad,2 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,3 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,4 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,5 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,6 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,7 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["SW"].sprite, floorTiles[2]["SW"].quad,8 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(floorTiles[2]["NE"].sprite, floorTiles[2]["NE"].quad,2 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,3 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,4 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,5 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,6 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["WE"].sprite, floorTiles[2]["WE"].quad,7 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NW"].sprite, floorTiles[2]["NW"].quad,8 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,2 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(floorTiles[2]["NS"].sprite, floorTiles[2]["NS"].quad,8 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(wallTiles[1]["SE"].sprite, wallTiles[1]["SE"].quad,1 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,2 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,3 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,4 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,5 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,6 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,7 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["SW"].sprite, wallTiles[1]["SW"].quad,9 * tile.sz,2 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,2 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,3 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,4 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,5 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,6 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,7 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["EW"].sprite, wallTiles[1]["EW"].quad,8 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["SW"].sprite, wallTiles[1]["SW"].quad,9 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-
-
-
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,9 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,3 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,4 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,5 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,6 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,7 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,8 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,9 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,10 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,11 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,12 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NS"].sprite, wallTiles[1]["NS"].quad,1 * tile.sz,13 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NE"].sprite, wallTiles[1]["NE"].quad,1 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
-  love.graphics.draw(wallTiles[1]["NW"].sprite, wallTiles[1]["NW"].quad,9 * tile.sz,14 * tile.sz,0,tile.mdf,tile.mdf)
 end
