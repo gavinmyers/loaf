@@ -27,7 +27,14 @@ win = {}
 win.w = tile.sz * (tile.acs + 2) 
 win.h = tile.sz * (tile.dwn + 2) 
 
-function love.load()
+player = {}
+player.x = 1
+player.y = 1
+player.tile = nil
+
+
+function main()
+  
   love.graphics.setDefaultFilter("nearest","nearest")
   love.window.setMode(win.w, win.h)
 
@@ -35,6 +42,7 @@ function love.load()
   wallTiles = resources.wall()
   gameTiles = resources.tile()
   playerTiles = resources.player()
+
 
   map = {}
   map.floor = {}
@@ -47,16 +55,50 @@ function love.load()
   end
   currentMap = generators.simple() 
   map.structure = currentMap.map
-  map.things[currentMap.startX][currentMap.startY] = playerTiles[1] 
+
+  map.floor[currentMap.startX][currentMap.startY] = gameTiles[2] 
+  map.floor[currentMap.endX][currentMap.endY] = gameTiles[3] 
+
+  player.x = currentMap.startX
+  player.y = currentMap.startY
+  player.tile = playerTiles[1]
+
+  map.things[player.x][player.y] = player.tile 
+
+end
+
+function action(who,targetX,targetY) 
+  if targetX < 2 or targetX > tile.acs -1 then 
+  elseif targetY < 2 or targetY > tile.dwn -1 then
+  elseif map.structure[targetX][targetY] ~= nil then
+  else
+    map.things[player.x][player.y] = nil 
+    player.x = targetX
+    player.y = targetY
+    map.things[player.x][player.y] = player.tile 
+    if player.x == currentMap.endX and player.y == currentMap.endY then
+      main()
+    end
+  end
+end
+
+function love.load()
+  main()
 end
 
 function love.keypressed(key)
   if key == "escape" then
     love.event.quit()
   elseif key == "w" then
+    action(player, player.x, player.y-1)
   elseif key == "a" then
+    action(player, player.x-1, player.y)
   elseif key == "s" then
+    action(player, player.x, player.y+1)
   elseif key == "d" then
+    action(player, player.x+1, player.y)
+  elseif key == " " then
+    main()
   end
 end
 
