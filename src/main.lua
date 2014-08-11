@@ -7,10 +7,10 @@ local inspect = require "lib/inspect"
 require "generators"
 
 tile = {}
-tile.sz = 16 
-tile.acs = 44 
-tile.dwn = 44 
-tile.mdf = 1
+tile.sz = 32 
+tile.acs = 22 
+tile.dwn = 22 
+tile.mdf =2 
 function tile.create(img,q) 
   return {sprite=img,quad=q}
 end
@@ -65,6 +65,7 @@ function main()
 
   map.things[player.x][player.y] = player.tile 
 
+  map.things[currentMap.endX][currentMap.endY] = playerTiles[2] 
 end
 
 function action(who,targetX,targetY) 
