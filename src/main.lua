@@ -23,6 +23,7 @@ require "resources/DawnLike_1/Objects/Floor"
 require "resources/DawnLike_1/Objects/Tile"
 require "resources/DawnLike_1/Objects/Wall"
 require "resources/DawnLike_1/Items/LongWep"
+require "resources/DawnLike_1/Items/Shield"
 require "resources/DawnLike_1/Characters/Player"
 
 win = {}
@@ -65,6 +66,7 @@ function main()
   gameTiles = resources.tile()
   playerTiles = resources.player()
   longWeaponTiles = resources.longWeapon()
+  shieldTiles = resources.shield()
 
 
   map = {}
@@ -118,6 +120,9 @@ function effectDefend(x, y)
     love.graphics.setColor(0,0,0,255)
   end
   tile.graphics.draw(dt.target.tile,x,y)
+
+  love.graphics.setColor(255, 255,255,255)
+  tile.graphics.draw(shieldTiles[1],x,y)
 
   dt.start = dt.start - 1 
   if(dt.start < 1) then
