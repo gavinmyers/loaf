@@ -22,6 +22,7 @@ end
 require "resources/DawnLike_1/Objects/Floor"
 require "resources/DawnLike_1/Objects/Tile"
 require "resources/DawnLike_1/Objects/Wall"
+require "resources/DawnLike_1/Items/LongWep"
 require "resources/DawnLike_1/Characters/Player"
 
 win = {}
@@ -63,19 +64,25 @@ function main()
   wallTiles = resources.wall()
   gameTiles = resources.tile()
   playerTiles = resources.player()
+  longWeaponTiles = resources.longWeapon()
 
 
   map = {}
   map.floor = {}
   map.structure = {}
+  map.items = {}
   map.creatures = {}
+  map.effects = {}
   for x = 1, tile.acs do
     map.floor[x] = {}
     map.structure[x] = {}
     map.creatures[x] = {}
+    map.items[x] = {}
+    map.effects[x] = {}
   end
   currentMap = generators.simple() 
   map.structure = currentMap.map
+
 
   map.floor[currentMap.startX][currentMap.startY] = gameTiles[2] 
   map.floor[currentMap.endX][currentMap.endY] = gameTiles[3] 
@@ -90,6 +97,55 @@ function main()
 
   map.creatures[player.x][player.y] = player
   map.creatures[goblin.x][goblin.y] = goblin 
+end
+
+function effect(typ,tile,tar,targetX,targetY)
+  if typ == "DAMAGE" then
+    map.effects[targetX][targetY] = {type=typ,tile=tile,method=effectDamage,start=10,target=tar} 
+  elseif typ == "DEFEND" then
+    map.effects[targetX][targetY] = {type=typ,tile=tile,method=effectDefend,start=10,target=tar} 
+  end
+end
+
+function effectDefend(x, y)
+  local dt = map.effects[x][y]
+  love.graphics.setColor(255,255,255,255)
+
+  love.graphics.setBlendMode("alpha")
+  if (dt.start % 2) == 0 then
+    love.graphics.setColor(0,0,0,255)
+  else
+    love.graphics.setColor(0,0,0,255)
+  end
+  tile.graphics.draw(dt.target.tile,x,y)
+
+  dt.start = dt.start - 1 
+  if(dt.start < 1) then
+    map.effects[x][y] = nil
+  end
+  love.graphics.setColor(255,255,255,255)
+end
+
+function effectDamage(x, y)
+  local dt = map.effects[x][y]
+  love.graphics.setColor(255,255,255,255)
+
+  love.graphics.setBlendMode("alpha")
+  if (dt.start % 2) == 0 then
+    love.graphics.setColor(255,0,0,255)
+  else
+    love.graphics.setColor(0,0,0,255)
+  end
+  tile.graphics.draw(dt.target.tile,x,y)
+
+  love.graphics.setColor(255, 255,255,255)
+  tile.graphics.draw(map.effects[x][y].tile,x,y)
+
+  dt.start = dt.start - 1 
+  if(dt.start < 1) then
+    map.effects[x][y] = nil
+  end
+  love.graphics.setColor(255, 255,255,255)
 end
 
 function action(who,targetX,targetY) 
@@ -117,10 +173,13 @@ function action(who,targetX,targetY)
       local defender = map.creatures[targetX][targetY]
       if math.random(1,attacker.attack * 6) > math.random(1, defender.defend * 6) then
         defender.hp = defender.hp - math.random(1,attacker.damage * 6)
+        effect("DAMAGE",longWeaponTiles[1],defender,defender.x,defender.y)
         if defender.hp < 1 then
           defender.die()
           mode = "MOVE"
         end
+      else
+        effect("DEFEND",longWeaponTiles[1],defender,defender.x,defender.y)
       end
     end
     mode = "MOVE" 
@@ -166,6 +225,12 @@ function love.draw()
       end
       if map.creatures[x] ~= nil and map.creatures[x][y] ~= nil then
         tile.graphics.draw(map.creatures[x][y].tile,x,y)
+      end
+      if map.items[x] ~= nil and map.items[x][y] ~= nil then
+        tile.graphics.draw(map.items[x][y],x,y)
+      end
+      if map.effects[x] ~= nil and map.effects[x][y] ~= nil then
+        map.effects[x][y].method(x,y)
       end
     end
   end
