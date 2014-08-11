@@ -40,6 +40,7 @@ player.die = function()
 end
 
 goblin = {}
+goblin.hostile = true
 goblin.hp = 50
 goblin.attack = 1
 goblin.defend = 2
@@ -97,6 +98,10 @@ function action(who,targetX,targetY)
   elseif mode == "MOVE" then
     if map.structure[targetX][targetY] ~= nil then
     elseif map.creatures[targetX][targetY] ~= nil then
+      if map.creatures[targetX][targetY].hostile == true then
+        mode = "PRIMARY"
+        action(who,targetX,targetY)
+      end
     else
       map.creatures[who.x][who.y] = nil 
       who.x = targetX
@@ -114,6 +119,7 @@ function action(who,targetX,targetY)
         defender.hp = defender.hp - math.random(1,attacker.damage * 6)
         if defender.hp < 1 then
           defender.die()
+          mode = "MOVE"
         end
       end
     end
