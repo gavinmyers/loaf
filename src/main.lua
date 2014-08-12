@@ -1,34 +1,9 @@
-floorTiles,wallTiles,gameTiles,playerTiles = nil
-currentMap = nil
-player = nil
-mode = "MOVE" 
-
-math.randomseed(os.time())
-local inspect = require "lib/inspect"
+require "game"
 require "generators"
+require "effects"
+require "tile"
 
-tile = {}
-tile.sz = 32 
-tile.acs = 22 
-tile.dwn = 22 
-tile.mdf =2 
-function tile.create(img,q) 
-  return {sprite=img,quad=q}
-end
-tile.graphics = {}
-function tile.graphics.draw(t,x,y) 
-  love.graphics.draw(t.sprite,t.quad,x*tile.sz,y*tile.sz,0,tile.mdf,tile.mdf)
-end
-require "resources/DawnLike_1/Objects/Floor"
-require "resources/DawnLike_1/Objects/Tile"
-require "resources/DawnLike_1/Objects/Wall"
-require "resources/DawnLike_1/Items/LongWep"
-require "resources/DawnLike_1/Items/Shield"
-require "resources/DawnLike_1/Characters/Player"
-
-win = {}
-win.w = tile.sz * (tile.acs + 2) 
-win.h = tile.sz * (tile.dwn + 2) 
+local inspect = require "lib/inspect"
 
 player = {}
 player.hp = 100
@@ -45,7 +20,7 @@ goblin = {}
 goblin.hostile = true
 goblin.hp = 50
 goblin.attack = 1
-goblin.defend = 2
+goblin.defend = 6 
 goblin.damage = 2
 goblin.x = 1
 goblin.y = 1
@@ -57,17 +32,11 @@ end
 
 
 function main()
-  
+  math.randomseed(os.time())
   love.graphics.setDefaultFilter("nearest","nearest")
-  love.window.setMode(win.w, win.h)
+  love.window.setMode(game.w, game.h)
 
-  floorTiles = resources.floor()
-  wallTiles = resources.wall()
-  gameTiles = resources.tile()
-  playerTiles = resources.player()
-  longWeaponTiles = resources.longWeapon()
-  shieldTiles = resources.shield()
-
+  tile.main()
 
   map = {}
   map.floor = {}
@@ -75,7 +44,7 @@ function main()
   map.items = {}
   map.creatures = {}
   map.effects = {}
-  for x = 1, tile.acs do
+  for x = 1, game.acs do
     map.floor[x] = {}
     map.structure[x] = {}
     map.creatures[x] = {}
@@ -86,81 +55,31 @@ function main()
   map.structure = currentMap.map
 
 
-  map.floor[currentMap.startX][currentMap.startY] = gameTiles[2] 
-  map.floor[currentMap.endX][currentMap.endY] = gameTiles[3] 
+  map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
+  map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
 
   player.x = currentMap.startX
   player.y = currentMap.startY
-  player.tile = playerTiles[1]
+  player.tile = tile.sets.player[1]
 
   goblin.x = currentMap.endX
   goblin.y = currentMap.endY
-  goblin.tile = playerTiles[2]
+  goblin.tile = tile.sets.player[2]
 
   map.creatures[player.x][player.y] = player
   map.creatures[goblin.x][goblin.y] = goblin 
 end
 
-function effect(typ,tile,tar,targetX,targetY)
-  if typ == "DAMAGE" then
-    map.effects[targetX][targetY] = {type=typ,tile=tile,method=effectDamage,start=10,target=tar} 
-  elseif typ == "DEFEND" then
-    map.effects[targetX][targetY] = {type=typ,tile=tile,method=effectDefend,start=10,target=tar} 
-  end
-end
-
-function effectDefend(x, y)
-  local dt = map.effects[x][y]
-  love.graphics.setColor(255,255,255,255)
-
-  love.graphics.setBlendMode("alpha")
-  if (dt.start % 2) == 0 then
-    love.graphics.setColor(0,0,0,255)
-  else
-    love.graphics.setColor(0,0,0,255)
-  end
-  tile.graphics.draw(dt.target.tile,x,y)
-
-  love.graphics.setColor(255, 255,255,255)
-  tile.graphics.draw(shieldTiles[1],x,y)
-
-  dt.start = dt.start - 1 
-  if(dt.start < 1) then
-    map.effects[x][y] = nil
-  end
-  love.graphics.setColor(255,255,255,255)
-end
-
-function effectDamage(x, y)
-  local dt = map.effects[x][y]
-  love.graphics.setColor(255,255,255,255)
-
-  love.graphics.setBlendMode("alpha")
-  if (dt.start % 2) == 0 then
-    love.graphics.setColor(255,0,0,255)
-  else
-    love.graphics.setColor(0,0,0,255)
-  end
-  tile.graphics.draw(dt.target.tile,x,y)
-
-  love.graphics.setColor(255, 255,255,255)
-  tile.graphics.draw(map.effects[x][y].tile,x,y)
-
-  dt.start = dt.start - 1 
-  if(dt.start < 1) then
-    map.effects[x][y] = nil
-  end
-  love.graphics.setColor(255, 255,255,255)
-end
-
 function action(who,targetX,targetY) 
-  if targetX < 2 or targetX > tile.acs -1 then 
-  elseif targetY < 2 or targetY > tile.dwn -1 then
-  elseif mode == "MOVE" then
+  if targetX < 2 or targetX > game.acs -1 then 
+  elseif targetY < 2 or targetY > game.dwn -1 then
+  elseif game.mode == nil or game.mode == "" or game.mode == "MOVE" then
     if map.structure[targetX][targetY] ~= nil then
+      map.structure[targetX][targetY] = nil
+      map.structure = generators.edges(map.structure) 
     elseif map.creatures[targetX][targetY] ~= nil then
       if map.creatures[targetX][targetY].hostile == true then
-        mode = "PRIMARY"
+        game.mode = "PRIMARY"
         action(who,targetX,targetY)
       end
     else
@@ -172,27 +91,23 @@ function action(who,targetX,targetY)
         main()
       end
     end
-  elseif mode == "PRIMARY" then
+  elseif game.mode == "PRIMARY" then
     if map.creatures[targetX][targetY] ~= nil then
       local attacker = who
       local defender = map.creatures[targetX][targetY]
       if math.random(1,attacker.attack * 6) > math.random(1, defender.defend * 6) then
         defender.hp = defender.hp - math.random(1,attacker.damage * 6)
-        effect("DAMAGE",longWeaponTiles[1],defender,defender.x,defender.y)
+        effect("DAMAGE",tile.sets.longWeapon[1],defender,defender.x,defender.y)
         if defender.hp < 1 then
           defender.die()
-          mode = "MOVE"
+          game.mode = "MOVE"
         end
       else
-        effect("DEFEND",longWeaponTiles[1],defender,defender.x,defender.y)
+        effect("DEFEND",tile.sets.longWeapon[1],defender,defender.x,defender.y)
       end
     end
-    mode = "MOVE" 
+    game.mode = "MOVE" 
   end
-end
-
-function love.load()
-  main()
 end
 
 function love.keypressed(key)
@@ -207,9 +122,9 @@ function love.keypressed(key)
   elseif key == "d" then
     action(player, player.x+1, player.y)
   elseif key == "q" then
-    mode = "PRIMARY"
+    game.mode = "PRIMARY"
   elseif key == "e" then
-    mode = "MOVE"
+    game.mode = "MOVE"
   elseif key == " " then
     main()
   end
@@ -219,9 +134,9 @@ function love.update(dt)
 end
 
 function love.draw()
-  for x = 1, tile.acs do
-    for y = 1, tile.dwn do
-      tile.graphics.draw(gameTiles[1],x,y)
+  for x = 1, game.acs do
+    for y = 1, game.dwn do
+      tile.graphics.draw(tile.sets.game[1],x,y)
       if map.floor[x] ~= nil and map.floor[x][y] ~= nil then
         tile.graphics.draw(map.floor[x][y],x,y)
       end
@@ -239,4 +154,8 @@ function love.draw()
       end
     end
   end
+end
+
+function love.load()
+  main()
 end
