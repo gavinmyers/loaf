@@ -16,11 +16,11 @@ end
 
 tile.sets = {}
 function tile.main() 
-  tile.sets.floor  = resources.floor()
-  tile.sets.wall  = resources.wall()
-  tile.sets.game  = resources.tile()
-  tile.sets.player  = resources.player()
-  tile.sets.longWeapon  = resources.longWeapon()
-  tile.sets.shield  = resources.shield()
+  tile.sets.floor = resources.floor()
+  tile.sets.wall = resources.wall()
+  tile.sets.game = resources.tile()
+  tile.sets.player = resources.player()
+  tile.sets.longWeapon = resources.longWeapon()
+  tile.sets.shield = resources.shield()
 end
 

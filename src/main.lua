@@ -5,31 +5,72 @@ require "tile"
 
 local inspect = require "lib/inspect"
 
-player = {}
-player.hp = 100
-player.attack = 2
-player.defend = 2
-player.damage = 2
-player.x = 1
-player.y = 1
-player.tile = nil
-player.die = function()
+ability = {}
+ability.db = {}
+function ability:create(id) 
+  local newAbility = {}
+  function newAbility:use(target)
+  end
+
+  function newAbility:useMod(ability,target)
+  end
+
+  function newAbility:attack(attacker,defender)
+  end
+
+  function newAbility:attackMod(ability,attacker,defender)
+  end
+
+  function newAbility:defend(attacker,defender)
+  end
+
+  function newAbility:defendMod(ability,attacker,defender)
+  end
+
+  function newAbility:damage(attacker,defender)
+  end
+
+  function newAbility:damageMod(ability,attacker,defender)
+  end
+
+  self.db[id] = newAbility
+
+  return newAbility
 end
 
-goblin = {}
-goblin.hostile = true
-goblin.hp = 50
-goblin.attack = 1
-goblin.defend = 6 
-goblin.damage = 2
-goblin.x = 1
-goblin.y = 1
-goblin.tile = nil
-goblin.die = function()
-  map.creatures[goblin.x][goblin.y] = nil 
-  print("SQUEEEEE!")
+longSwordAbility = ability:create("LS")
+function longSwordAbility:attack(attacker,defender)
+  local base = attacker.attack
+  local mod = 2
+  local dice = base + mod
+  return math.random(1,dice * 6)
 end
 
+creature = {}
+creature.db = {}
+function creature:create(id) 
+  local newCreature = {}
+  newCreature.hostile = true
+  newCreature.hp = 1
+  newCreature.attack = 0
+  newCreature.ability = nil
+  newCreature.defend = 0
+  newCreature.damage = 0
+  newCreature.abilities = {}
+  newCreature.x = 1 
+  newCreature.y = 1 
+  newCreature.tile = nil
+  function newCreature:die()
+    print("SQUEEEE!")
+  end
+  self.db[id] = newCreature
+  return newCreature
+end
+
+
+
+player = creature:create("PLAYER") 
+goblin = creature:create("GOBLIN") 
 
 function main()
   math.randomseed(os.time())
@@ -58,13 +99,23 @@ function main()
   map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
   map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
 
+  player.hp = 100
+  player.attack = 2
+  player.defend = 2
+  player.damage = 2
   player.x = currentMap.startX
   player.y = currentMap.startY
   player.tile = tile.sets.player[1]
+  player.abilities[1] = longSwordAbility
+  player.ability = longSwordAbility
 
   goblin.x = currentMap.endX
   goblin.y = currentMap.endY
   goblin.tile = tile.sets.player[2]
+  goblin.hp = 50
+  goblin.attack = 1
+  goblin.defend = 6 
+  goblin.damage = 2
 
   map.creatures[player.x][player.y] = player
   map.creatures[goblin.x][goblin.y] = goblin 
@@ -79,7 +130,7 @@ function action(who,targetX,targetY)
       map.structure = generators.edges(map.structure) 
     elseif map.creatures[targetX][targetY] ~= nil then
       if map.creatures[targetX][targetY].hostile == true then
-        game.mode = "PRIMARY"
+        game.mode = "ABILITY"
         action(who,targetX,targetY)
       end
     else
@@ -91,15 +142,17 @@ function action(who,targetX,targetY)
         main()
       end
     end
-  elseif game.mode == "PRIMARY" then
+  elseif game.mode == "ABILITY" then
     if map.creatures[targetX][targetY] ~= nil then
+
       local attacker = who
       local defender = map.creatures[targetX][targetY]
-      if math.random(1,attacker.attack * 6) > math.random(1, defender.defend * 6) then
+
+      if attacker.ability:attack(attacker,defender)  > math.random(1, defender.defend * 6) then
         defender.hp = defender.hp - math.random(1,attacker.damage * 6)
         effect("DAMAGE",tile.sets.longWeapon[1],defender,defender.x,defender.y)
         if defender.hp < 1 then
-          defender.die()
+          defender:die()
           game.mode = "MOVE"
         end
       else
@@ -122,7 +175,7 @@ function love.keypressed(key)
   elseif key == "d" then
     action(player, player.x+1, player.y)
   elseif key == "q" then
-    game.mode = "PRIMARY"
+    game.mode = "ABILITY"
   elseif key == "e" then
     game.mode = "MOVE"
   elseif key == " " then
