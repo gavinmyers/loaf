@@ -9,28 +9,82 @@ ability = {}
 ability.db = {}
 function ability:create(id) 
   local newAbility = {}
+  newAbility.id = id
+  newAbility.modifiers = {}  
   function newAbility:use(target)
+    if self._use ~= nil then
+      return self:_use(target)
+    end
   end
 
   function newAbility:useMod(ability,target)
+    if self._useMod ~= nil then
+      return self:_useMod(ability,target)
+    end
   end
 
   function newAbility:attack(attacker,defender)
+    local res = false
+    if self._attack ~= nil then
+      res = self:_attack(attacker,defender)
+    end
+    for i = 1, #self.modifiers do
+      local mod = self.modifiers[i]
+      res = res + mod:attackMod(self,attacker,defender)
+    end
+    return res
   end
 
   function newAbility:attackMod(ability,attacker,defender)
+    if self._attackMod ~= nil then
+      return self:_attackMod(ability,attacker,defender)
+    end
   end
 
   function newAbility:defend(attacker,defender)
+    if self._defend ~= nil then
+      return self:_defend(attacker,defender)
+    end
   end
 
   function newAbility:defendMod(ability,attacker,defender)
+    if self._defendMod ~= nil then
+      return self:_defendMod(ability,attacker,defender)
+    end
   end
 
   function newAbility:damage(attacker,defender)
+    local res
+    if self._damage ~= nil then
+      res = self:_damage(attacker,defender)
+    end
+    for i = 1, #self.modifiers do
+      local mod = self.modifiers[i]
+      res = res + mod:damageMod(self,attacker,defender)
+    end
+    return res
   end
 
   function newAbility:damageMod(ability,attacker,defender)
+    local res = 0 
+    if self._damageMod ~= nil then
+      res = self:_damageMod(ability,attacker,defender)
+    end
+    return res
+
+  end
+
+
+  function newAbility:soak(attacker,defender)
+    if self._soak ~= nil then
+      return self:_soak(attacker,defender)
+    end
+  end
+
+  function newAbility:soakMod(ability,attacker,defender)
+    if self._soakMod ~= nil then
+      return self:_soakMod(ability,attacker,defender)
+    end
   end
 
   self.db[id] = newAbility
@@ -39,38 +93,157 @@ function ability:create(id)
 end
 
 longSwordAbility = ability:create("LS")
-function longSwordAbility:attack(attacker,defender)
+function longSwordAbility:_attack(attacker,defender)
   local base = attacker.attack
   local mod = 2
   local dice = base + mod
   return math.random(1,dice * 6)
 end
 
+function longSwordAbility:_damage(attacker,defender)
+  local base = attacker.damage
+  local mod = 2
+  local dice = base + mod
+  return math.random(1,dice * 6)
+end
+
+
+modifier = {}
+modifier.db = {}
+function modifier:create(id)
+  local newModifier = {}
+  newModifier.id = id
+  newModifier.modifiers = {}  
+
+  function newModifier:useMod(ability,target)
+    if self._useMod ~= nil then
+      return self:_useMod(ability,target)
+    end
+    return 0
+  end
+
+  function newModifier:attackMod(ability,attacker,defender)
+    if self._attackMod ~= nil then
+      return self:_attackMod(ability,attacker,defender)
+    end
+    return 0
+  end
+
+  function newModifier:defendMod(ability,attacker,defender)
+    if self._defendMod ~= nil then
+      return self:_defendMod(ability,attacker,defender)
+    end
+    return 0
+  end
+
+  function newModifier:damageMod(ability,attacker,defender)
+    if self._damageMod ~= nil then
+      return self:_damageMod(ability,attacker,defender)
+    end
+    return 0
+  end
+
+  function newModifier:soakMod(ability,attacker,defender)
+    if self._soakMod ~= nil then
+      return self:_soakMod(ability,attacker,defender)
+    end
+    return 0
+  end
+
+  self.db[id] = newModifier
+
+  return newModifier
+end
+
+stabTown = modifier:create("TB")
+function stabTown:_damageMod(ability,attacker,defender)
+  return 1000
+end
+longSwordAbility.modifiers[1] = stabTown
+
+function combat(attacker,defender)
+  local ability = attacker.ability
+  local attackRoll = ability:attack(attacker,defender)
+  for i = 1, #attacker.abilities do
+    local abilityMod = attacker.abilities[i]
+    if abilityMod ~= ability then
+      attackRoll = attackRoll * abilityMod:attackMod(ability,attacker,defender)
+    end
+  end
+  
+  local defendRoll = math.random(1,defender.defend * 6)
+  for i = 1, #defender.abilities do
+    local abilityMod = defender.abilities[i]
+    defendRoll = defendRoll * abilityMod:defendMod(ability,attacker,defender)
+  end
+
+  if attackRoll > defendRoll then
+    return damage(attacker,defender)
+  else
+    return false
+  end
+end
+
+function damage(attacker,defender)
+  local ability = attacker.ability
+  local damageRoll = ability:damage(attacker,defender)
+  for i = 1, #attacker.abilities do
+    local abilityMod = attacker.abilities[i]
+    if abilityMod ~= ability then
+      damageRoll = damageRoll * abilityMod:damageMod(ability,attacker,defender)
+    end
+  end
+  if damageRoll == nil then damageRoll = 0 end
+  
+  local soakRoll = math.random(1,defender.soak * 6)
+  for i = 1, #defender.abilities do
+    local abilityMod = defender.abilities[i]
+    soakRoll = soakRoll * abilityMod:soakMod(ability,attacker,defender)
+  end
+  if soakRoll == nil then soakRoll = 0 end
+
+  if damageRoll > soakRoll then
+    defender.hp = defender.hp - (damageRoll - soakRoll)
+    if defender.hp < 1 then
+      defender:die()
+    end
+    return true
+  else
+    return false
+  end
+end
+
 creature = {}
 creature.db = {}
+function creature:remove(id)
+  local cr = self.db[id]
+  map.creatures[cr.x][cr.y] = nil
+  self.db[id] = nil
+end
+
 function creature:create(id) 
   local newCreature = {}
+  newCreature.id = id
   newCreature.hostile = true
   newCreature.hp = 1
   newCreature.attack = 0
   newCreature.ability = nil
   newCreature.defend = 0
+  newCreature.soak = 0
   newCreature.damage = 0
   newCreature.abilities = {}
   newCreature.x = 1 
   newCreature.y = 1 
   newCreature.tile = nil
   function newCreature:die()
+    creature:remove(self.id)
     print("SQUEEEE!")
   end
   self.db[id] = newCreature
   return newCreature
 end
 
-
-
 player = creature:create("PLAYER") 
-goblin = creature:create("GOBLIN") 
 
 function main()
   math.randomseed(os.time())
@@ -100,21 +273,22 @@ function main()
   map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
 
   player.hp = 100
-  player.attack = 2
-  player.defend = 2
-  player.damage = 2
+  player.attack = 4 
+  player.defend = 4 
+  player.damage = 4 
   player.x = currentMap.startX
   player.y = currentMap.startY
   player.tile = tile.sets.player[1]
   player.abilities[1] = longSwordAbility
   player.ability = longSwordAbility
 
+  goblin = creature:create("GOBLIN") 
   goblin.x = currentMap.endX
   goblin.y = currentMap.endY
   goblin.tile = tile.sets.player[2]
-  goblin.hp = 50
+  goblin.hp = 5000
   goblin.attack = 1
-  goblin.defend = 6 
+  goblin.defend = 1 
   goblin.damage = 2
 
   map.creatures[player.x][player.y] = player
@@ -147,14 +321,8 @@ function action(who,targetX,targetY)
 
       local attacker = who
       local defender = map.creatures[targetX][targetY]
-
-      if attacker.ability:attack(attacker,defender)  > math.random(1, defender.defend * 6) then
-        defender.hp = defender.hp - math.random(1,attacker.damage * 6)
+      if combat(attacker,defender) then
         effect("DAMAGE",tile.sets.longWeapon[1],defender,defender.x,defender.y)
-        if defender.hp < 1 then
-          defender:die()
-          game.mode = "MOVE"
-        end
       else
         effect("DEFEND",tile.sets.longWeapon[1],defender,defender.x,defender.y)
       end
