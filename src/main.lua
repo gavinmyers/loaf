@@ -8,8 +8,8 @@ local inspect = require "lib/inspect"
 font = love.graphics.newFont("resources/fonts/VeraMono.ttf",14)
 love.graphics.setFont(font)
 
-font2 = love.graphics.newFont("resources/DawnLike_1/GUI/SDS_8x8.ttf",14)
-love.graphics.setFont(font2)
+gameFont = love.graphics.newFont("resources/DawnLike_1/GUI/SDS_8x8.ttf",14)
+gameFont = love.graphics.newFont("resources/fonts/VeraMono.ttf",18)
 
 item = {}
 item.db = {}
@@ -287,6 +287,7 @@ function main()
     map.gui_3[x] = {}
   end
 
+  --[[
   drawSelectTile(2,1,tile.sets.longWeapon[2])
   drawSelectTile(7,1,tile.sets.longWeapon[4])
   drawSelectTile(12,1,tile.sets.longWeapon[6])
@@ -306,35 +307,8 @@ function main()
   drawSelectTile(7,16,tile.sets.longWeapon[2])
   drawSelectTile(12,16,tile.sets.longWeapon[2])
   drawSelectTile(17,16,tile.sets.longWeapon[2])
+  ]]--
 
-  currentMap = generators.simple() 
-  map.structure = currentMap.map
-
-
-  map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
-  map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
-
-  player.hp = 100
-  player.attack = 4 
-  player.defend = 4 
-  player.damage = 4 
-  player.x = currentMap.startX
-  player.y = currentMap.startY
-  player.tile = tile.sets.player[1]
-  player.abilities[1] = longSwordAbility
-  player.ability = longSwordAbility
-
-  goblin = creature:create("GOBLIN") 
-  goblin.x = currentMap.endX
-  goblin.y = currentMap.endY
-  goblin.tile = tile.sets.player[2]
-  goblin.hp = 5000
-  goblin.attack = 1
-  goblin.defend = 1 
-  goblin.damage = 2
-
-  map.creatures[player.x][player.y] = player
-  map.creatures[goblin.x][goblin.y] = goblin 
 end
 
 function action(who,targetX,targetY) 
@@ -378,6 +352,8 @@ function love.keypressed(key)
     keyWelcome(key)
   elseif game.screen == "GAME" then
     keyGame(key)
+  else 
+    keyGame(key)
   end
 end
 
@@ -405,6 +381,7 @@ function keyWelcome(key)
   if key == "x" then
     love.event.quit()
   elseif key == "1" then
+    game.screen = "TUTORIAL"
   elseif key == "2" then
   end
 end
@@ -417,15 +394,51 @@ function love.draw()
     drawWelcome()
   elseif game.screen == "GAME" then
     drawGame()
+  elseif game.screen == "TUTORIAL" then
+    drawTutorial()
   end
 end
 
+drawTutorialFirst = false
+function drawTutorial()
+  if drawTutorialFirst == false then
+    drawTutorialFirst = true
+    currentMap = generators.simple() 
+    map.structure = currentMap.map
+    map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
+    map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
+    player.hp = 100
+    player.attack = 4 
+    player.defend = 4 
+    player.damage = 4 
+    player.x = currentMap.startX
+    player.y = currentMap.startY
+    player.tile = tile.sets.player[1]
+    player.abilities[1] = longSwordAbility
+    player.ability = longSwordAbility
+    goblin = creature:create("GOBLIN") 
+    goblin.x = currentMap.endX
+    goblin.y = currentMap.endY
+    goblin.tile = tile.sets.player[2]
+    goblin.hp = 5000
+    goblin.attack = 1
+    goblin.defend = 1 
+    goblin.damage = 2
+    map.creatures[player.x][player.y] = player
+    map.creatures[goblin.x][goblin.y] = goblin 
+  end
+  drawGame()
+  love.graphics.setColor(255, 255, 255)
+  local screenWidth, screenHeight = love.window.getDimensions()
+  love.graphics.setFont(gameFont)
+  love.graphics.printf("\n kill the guard... \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, 1, screenWidth, "left")
+end
+
 function drawWelcome()
-  local w = 224 
-  local h = 50 
   love.graphics.setColor(255, 255, 255)
-  love.graphics.print("\n******************\n   WELCOME TO LOAF \n******************\n\n [1] TUTORIAL \n\n [2] CONTINUE \n\n [X] QUIT",w,h)
-  love.graphics.setColor(255, 255, 255)
+  local screenWidth, screenHeight = love.window.getDimensions()
+  love.graphics.setFont(gameFont)
+  love.graphics.printf("\n******************\n   WELCOME TO LOAF \n******************\n\n [1] TUTORIAL \n\n [2] CONTINUE \n\n [X] QUIT", 0, 1, screenWidth, "center")
 end
 
 function drawTileset(ts)
@@ -455,7 +468,6 @@ function drawGame()
   drawTileset(map.gui_1)
   drawTileset(map.gui_2)
   drawTileset(map.gui_3)
---
 end
 
 function drawSelectTile(x,y,t)
