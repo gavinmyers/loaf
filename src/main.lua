@@ -11,6 +11,22 @@ love.graphics.setFont(font)
 gameFont = love.graphics.newFont("resources/DawnLike_1/GUI/SDS_8x8.ttf",14)
 gameFont = love.graphics.newFont("resources/fonts/VeraMono.ttf",18)
 
+events = {}
+events.db = {}
+function events:create(id)
+  local ev = {}
+  ev.id = id
+  ev.x = 0
+  ev.y = 0
+  function ev:trigger(target)
+    if self._trigger ~= nil then
+      return self:_trigger(target)
+    end
+  end
+  events.db[id] = ev
+  return ev
+end 
+
 item = {}
 item.db = {}
 function item:create(id)
@@ -268,6 +284,7 @@ function main()
   tile.main()
 
   map = {}
+  map.events = {}
   map.floor = {}
   map.structure = {}
   map.items = {}
@@ -277,6 +294,7 @@ function main()
   map.gui_2 = {}
   map.gui_3 = {}
   for x = 1, game.acs do
+    map.events[x] = {}
     map.floor[x] = {}
     map.structure[x] = {}
     map.creatures[x] = {}
@@ -316,21 +334,18 @@ function action(who,targetX,targetY)
   elseif targetY < 2 or targetY > game.dwn -1 then
   elseif game.mode == nil or game.mode == "" or game.mode == "MOVE" then
     if map.structure[targetX][targetY] ~= nil then
-      map.structure[targetX][targetY] = nil
-      map.structure = generators.edges(map.structure) 
     elseif map.creatures[targetX][targetY] ~= nil then
       if map.creatures[targetX][targetY].hostile == true then
         game.mode = "ABILITY"
         action(who,targetX,targetY)
       end
+    elseif map.events[targetX][targetY] ~= nil then
+      map.events[targetX][targetY].trigger(who)
     else
       map.creatures[who.x][who.y] = nil 
       who.x = targetX
       who.y = targetY
       map.creatures[who.x][who.y] = who
-      if who.x == currentMap.endX and who.y == currentMap.endY then
-        main()
-      end
     end
   elseif game.mode == "ABILITY" then
     if map.creatures[targetX][targetY] ~= nil then
@@ -403,10 +418,18 @@ drawTutorialFirst = false
 function drawTutorial()
   if drawTutorialFirst == false then
     drawTutorialFirst = true
-    currentMap = generators.simple() 
+    currentMap = generators.simple(22,8) 
     map.structure = currentMap.map
     map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
     map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
+    local ev = events:create("DWN")
+    ev.x = currentMap.endX
+    ev.y = currentMap.endY
+
+    ev.trigger = function(target)
+      print("DOWN!")
+    end
+    map.events[currentMap.endX][currentMap.endY] = ev 
     player.hp = 100
     player.attack = 4 
     player.defend = 4 
@@ -416,7 +439,7 @@ function drawTutorial()
     player.tile = tile.sets.player[1]
     player.abilities[1] = longSwordAbility
     player.ability = longSwordAbility
-    goblin = creature:create("GOBLIN") 
+    local goblin = creature:create("GOBLIN") 
     goblin.x = currentMap.endX
     goblin.y = currentMap.endY
     goblin.tile = tile.sets.player[2]
@@ -431,7 +454,7 @@ function drawTutorial()
   love.graphics.setColor(255, 255, 255)
   local screenWidth, screenHeight = love.window.getDimensions()
   love.graphics.setFont(gameFont)
-  love.graphics.printf("\n kill the guard... \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, 1, screenWidth, "left")
+  love.graphics.printf("\n Kill the guard! \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, screenHeight - 200, screenWidth, "left")
 end
 
 function drawWelcome()
@@ -456,7 +479,7 @@ end
 function drawGame()
   for x = 1, game.acs do
     for y = 1, game.dwn do
-      tile.graphics.draw(tile.sets.game[1],x,y)
+      --tile.graphics.draw(tile.sets.game[1],x,y)
     end
   end
 
