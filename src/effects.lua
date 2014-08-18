@@ -1,8 +1,8 @@
 function effect(typ,tile,tar,targetX,targetY)
   if typ == "DAMAGE" then
-    map.effects[targetX][targetY] = {type=typ,tile=tile,method=effectDamage,start=10,target=tar} 
+    map.effects[targetX][targetY] = {type=typ,tile=tile,draw=effectDamage,start=10,target=tar} 
   elseif typ == "DEFEND" then
-    map.effects[targetX][targetY] = {type=typ,tile=tile,method=effectDefend,start=10,target=tar} 
+    map.effects[targetX][targetY] = {type=typ,tile=tile,draw=effectDefend,start=10,target=tar} 
   end
 end
 

@@ -3,15 +3,30 @@ require "resources/DawnLike_1/Objects/Tile"
 require "resources/DawnLike_1/Objects/Wall"
 require "resources/DawnLike_1/Items/LongWep"
 require "resources/DawnLike_1/Items/Shield"
+require "resources/DawnLike_1/Items/Scroll"
 require "resources/DawnLike_1/Characters/Player"
+require "resources/DawnLike_1/GUI/GUI0"
 
 tile = {}
 function tile.create(img,q) 
-  return {sprite=img,quad=q}
+  return {sprite=img,quad=q,mdf=game.mdf}
 end
 tile.graphics = {}
 function tile.graphics.draw(t,x,y) 
-  love.graphics.draw(t.sprite,t.quad,x*game.sz,y*game.sz,0,game.mdf,game.mdf)
+  if t == nil or t == 0 then
+    return
+  end
+
+  if t.draw ~= nil then
+    t.draw(x,y)
+
+  elseif t.tile ~= nil and type(t.tile) == "table" then
+    love.graphics.draw(t.tile.sprite,t.tile.quad,x*game.sz,y*game.sz,0,t.tile.mdf,t.tile.mdf)
+
+  else
+    love.graphics.draw(t.sprite,t.quad,x*game.sz,y*game.sz,0,t.mdf,t.mdf)
+
+  end
 end
 
 tile.sets = {}
@@ -22,5 +37,7 @@ function tile.main()
   tile.sets.player = resources.player()
   tile.sets.longWeapon = resources.longWeapon()
   tile.sets.shield = resources.shield()
+  tile.sets.scroll = resources.scroll()
+  tile.sets.gui = resources.gui()
 end
 

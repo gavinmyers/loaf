@@ -5,6 +5,21 @@ require "tile"
 
 local inspect = require "lib/inspect"
 
+font = love.graphics.newFont("resources/fonts/VeraMono.ttf",14)
+love.graphics.setFont(font)
+
+font2 = love.graphics.newFont("resources/DawnLike_1/GUI/SDS_8x8.ttf",14)
+love.graphics.setFont(font2)
+
+item = {}
+item.db = {}
+function item:create(id)
+  local ni = {}
+  ni.id = id
+  item.db[id] = ni
+  return ni
+end
+
 ability = {}
 ability.db = {}
 function ability:create(id) 
@@ -258,13 +273,40 @@ function main()
   map.items = {}
   map.creatures = {}
   map.effects = {}
+  map.gui_1 = {}
+  map.gui_2 = {}
+  map.gui_3 = {}
   for x = 1, game.acs do
     map.floor[x] = {}
     map.structure[x] = {}
     map.creatures[x] = {}
     map.items[x] = {}
     map.effects[x] = {}
+    map.gui_1[x] = {}
+    map.gui_2[x] = {}
+    map.gui_3[x] = {}
   end
+
+  drawSelectTile(2,1,tile.sets.longWeapon[2])
+  drawSelectTile(7,1,tile.sets.longWeapon[4])
+  drawSelectTile(12,1,tile.sets.longWeapon[6])
+  drawSelectTile(17,1,tile.sets.longWeapon[8])
+
+  drawSelectTile(2,6,tile.sets.longWeapon[2])
+  drawSelectTile(7,6,tile.sets.longWeapon[2])
+  drawSelectTile(12,6,tile.sets.longWeapon[2])
+  drawSelectTile(17,6,tile.sets.longWeapon[2])
+
+  drawSelectTile(2,11,tile.sets.longWeapon[2])
+  drawSelectTile(7,11,tile.sets.longWeapon[2])
+  drawSelectTile(12,11,tile.sets.longWeapon[2])
+  drawSelectTile(17,11,tile.sets.longWeapon[2])
+
+  drawSelectTile(2,16,tile.sets.longWeapon[2])
+  drawSelectTile(7,16,tile.sets.longWeapon[2])
+  drawSelectTile(12,16,tile.sets.longWeapon[2])
+  drawSelectTile(17,16,tile.sets.longWeapon[2])
+
   currentMap = generators.simple() 
   map.structure = currentMap.map
 
@@ -332,6 +374,14 @@ function action(who,targetX,targetY)
 end
 
 function love.keypressed(key)
+  if game.screen == "WELCOME" then
+    keyWelcome(key)
+  elseif game.screen == "GAME" then
+    keyGame(key)
+  end
+end
+
+function keyGame(key)
   if key == "escape" then
     love.event.quit()
   elseif key == "w" then
@@ -351,30 +401,90 @@ function love.keypressed(key)
   end
 end
 
+function keyWelcome(key)
+  if key == "x" then
+    love.event.quit()
+  elseif key == "1" then
+  elseif key == "2" then
+  end
+end
+
 function love.update(dt)
 end
 
 function love.draw()
+  if game.screen == "WELCOME" then
+    drawWelcome()
+  elseif game.screen == "GAME" then
+    drawGame()
+  end
+end
+
+function drawWelcome()
+  local w = 224 
+  local h = 50 
+  love.graphics.setColor(255, 255, 255)
+  love.graphics.print("\n******************\n   WELCOME TO LOAF \n******************\n\n [1] TUTORIAL \n\n [2] CONTINUE \n\n [X] QUIT",w,h)
+  love.graphics.setColor(255, 255, 255)
+end
+
+function drawTileset(ts)
   for x = 1, game.acs do
-    for y = 1, game.dwn do
-      tile.graphics.draw(tile.sets.game[1],x,y)
-      if map.floor[x] ~= nil and map.floor[x][y] ~= nil then
-        tile.graphics.draw(map.floor[x][y],x,y)
-      end
-      if map.structure[x] ~= nil and map.structure[x][y] ~= nil then
-        tile.graphics.draw(map.structure[x][y],x,y)
-      end
-      if map.creatures[x] ~= nil and map.creatures[x][y] ~= nil then
-        tile.graphics.draw(map.creatures[x][y].tile,x,y)
-      end
-      if map.items[x] ~= nil and map.items[x][y] ~= nil then
-        tile.graphics.draw(map.items[x][y],x,y)
-      end
-      if map.effects[x] ~= nil and map.effects[x][y] ~= nil then
-        map.effects[x][y].method(x,y)
+    if ts[x] ~= nil then
+      for y = 1, game.dwn do
+        if ts[x][y] ~= nil then
+          tile.graphics.draw(ts[x][y],x,y)
+        end
       end
     end
   end
+end
+
+function drawGame()
+  for x = 1, game.acs do
+    for y = 1, game.dwn do
+      tile.graphics.draw(tile.sets.game[1],x,y)
+    end
+  end
+
+  drawTileset(map.floor)
+  drawTileset(map.structure)
+  drawTileset(map.creatures)
+  drawTileset(map.items)
+  drawTileset(map.effects)
+  drawTileset(map.gui_1)
+  drawTileset(map.gui_2)
+  drawTileset(map.gui_3)
+--
+end
+
+function drawSelectTile(x,y,t)
+  map.gui_1[x    ][y    ] = tile.sets.gui[1]
+  map.gui_1[x    ][y + 1] = tile.sets.gui[2]
+  map.gui_1[x    ][y + 2] = tile.sets.gui[2]
+  map.gui_1[x    ][y + 3] = tile.sets.gui[2]
+  map.gui_1[x + 1][y    ] = tile.sets.gui[3]
+  map.gui_1[x + 2][y    ] = tile.sets.gui[3]
+  map.gui_1[x + 3][y    ] = tile.sets.gui[3]
+  map.gui_1[x + 4][y    ] = tile.sets.gui[4]
+  map.gui_1[x + 4][y + 1] = tile.sets.gui[5]
+  map.gui_1[x + 4][y + 2] = tile.sets.gui[5]
+  map.gui_1[x + 4][y + 3] = tile.sets.gui[5]
+  map.gui_1[x + 4][y + 4] = tile.sets.gui[6]
+  map.gui_1[x + 3][y + 4] = tile.sets.gui[7]
+  map.gui_1[x + 2][y + 4] = tile.sets.gui[7]
+  map.gui_1[x + 1][y + 4] = tile.sets.gui[7]
+  map.gui_1[x    ][y + 4] = tile.sets.gui[8]
+  map.gui_1[x + 1][y + 3] = tile.sets.gui[9]
+  map.gui_1[x + 1][y + 2] = tile.sets.gui[9]
+  map.gui_1[x + 1][y + 1] = tile.sets.gui[9]
+  map.gui_1[x + 2][y + 3] = tile.sets.gui[9]
+  map.gui_1[x + 2][y + 2] = tile.sets.gui[9]
+  map.gui_1[x + 2][y + 1] = tile.sets.gui[9]
+  map.gui_1[x + 3][y + 3] = tile.sets.gui[9]
+  map.gui_1[x + 3][y + 2] = tile.sets.gui[9]
+  map.gui_1[x + 3][y + 1] = tile.sets.gui[9]
+  map.gui_2[x + 1][y + 1] = t 
 end
 
 function love.load()

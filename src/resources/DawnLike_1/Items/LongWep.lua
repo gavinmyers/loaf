@@ -7,6 +7,21 @@ if resources == nil then
 end
 
 function resources.longWeapon() 
-  local longSword = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),32,16)
-  return {longSword}
+  local d = {}
+  d[1]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),32,16)
+  d[2]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),32,16)
+  d[2].mdf = 6 
+
+  d[3]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),16,16)
+  d[4]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),16,16)
+  d[4].mdf = 6 
+
+  d[5]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),0,0)
+  d[6]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),0,0)
+  d[6].mdf = 6 
+
+  d[7]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),16,0)
+  d[8]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),16,0)
+  d[8].mdf = 6 
+  return d 
 end
