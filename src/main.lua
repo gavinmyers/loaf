@@ -276,7 +276,7 @@ end
 
 player = creature:create("PLAYER") 
 
-function main()
+function reset()
   math.randomseed(os.time())
   love.graphics.setDefaultFilter("nearest","nearest")
   love.window.setMode(game.w, game.h)
@@ -304,6 +304,11 @@ function main()
     map.gui_2[x] = {}
     map.gui_3[x] = {}
   end
+
+end
+
+function main()
+  reset()
 
   --[[
   drawSelectTile(2,1,tile.sets.longWeapon[2])
@@ -427,7 +432,10 @@ function drawTutorial()
     ev.y = currentMap.endY
 
     ev.trigger = function(target)
-      print("DOWN!")
+      print("TIME TO DRAW")
+      drawTutorialFirst = false 
+      reset()
+      drawTutorial()
     end
     map.events[currentMap.endX][currentMap.endY] = ev 
     player.hp = 100
