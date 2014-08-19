@@ -425,7 +425,7 @@ function drawTutorial()
     drawTutorialFirst = true
     currentMap = generators.simple(22,8) 
     map.structure = currentMap.map
-    map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
+    --map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
     map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
     local ev = events:create("DWN")
     ev.x = currentMap.endX
