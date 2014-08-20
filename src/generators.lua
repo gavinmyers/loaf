@@ -1,10 +1,10 @@
 generators = {}
 
-function generators.edges(m) 
+function generators.edges(m,set) 
   for x = 1, game.acs do
     for y = 1, game.dwn do
       if m[x][y] ~= nil then
-        m[x][y] = tile.sets.wall[1][generators.edge(m,x,y)]
+        m[x][y] = set[generators.edge(m,x,y)]
       end
     end
   end
@@ -151,7 +151,7 @@ function generators.simple(acs,dwn)
   end
   ex = cx
   ey = cy
-  m = generators.edges(m)
+  m = generators.edges(m,tile.sets.wall[1])
   return {map=m,startX=sx,startY=sy,endX=ex,endY=ey}
 end
 

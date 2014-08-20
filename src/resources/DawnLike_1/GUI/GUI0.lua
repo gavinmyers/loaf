@@ -18,5 +18,16 @@ function resources.gui()
   d[8] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),208,128)
   d[9] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),224,112)
 
+  d[10] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),144,96)
+  d[11] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),144,112)
+  d[12] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),160,96)
+  d[13] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),176,96)
+  d[14] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),176,112)
+  d[15] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),176,128)
+  d[16] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),160,128)
+  d[17] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),144,128)
+  d[18] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),160,112)
+
+
   return d 
 end

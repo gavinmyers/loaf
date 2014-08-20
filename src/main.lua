@@ -309,29 +309,7 @@ end
 
 function main()
   reset()
-
-  --[[
-  drawSelectTile(2,1,tile.sets.longWeapon[2])
-  drawSelectTile(7,1,tile.sets.longWeapon[4])
-  drawSelectTile(12,1,tile.sets.longWeapon[6])
-  drawSelectTile(17,1,tile.sets.longWeapon[8])
-
-  drawSelectTile(2,6,tile.sets.longWeapon[2])
-  drawSelectTile(7,6,tile.sets.longWeapon[2])
-  drawSelectTile(12,6,tile.sets.longWeapon[2])
-  drawSelectTile(17,6,tile.sets.longWeapon[2])
-
-  drawSelectTile(2,11,tile.sets.longWeapon[2])
-  drawSelectTile(7,11,tile.sets.longWeapon[2])
-  drawSelectTile(12,11,tile.sets.longWeapon[2])
-  drawSelectTile(17,11,tile.sets.longWeapon[2])
-
-  drawSelectTile(2,16,tile.sets.longWeapon[2])
-  drawSelectTile(7,16,tile.sets.longWeapon[2])
-  drawSelectTile(12,16,tile.sets.longWeapon[2])
-  drawSelectTile(17,16,tile.sets.longWeapon[2])
-  ]]--
-
+  drawWelcome()
 end
 
 function action(who,targetX,targetY) 
@@ -367,75 +345,55 @@ function action(who,targetX,targetY)
   end
 end
 
+keyListener = nil
 function love.keypressed(key)
-  if game.screen == "WELCOME" then
-    keyWelcome(key)
-  elseif game.screen == "GAME" then
-    keyGame(key)
-  else 
-    keyGame(key)
-  end
-end
-
-function keyGame(key)
-  if key == "escape" then
-    love.event.quit()
-  elseif key == "w" then
-    action(player, player.x, player.y-1)
-  elseif key == "a" then
-    action(player, player.x-1, player.y)
-  elseif key == "s" then
-    action(player, player.x, player.y+1)
-  elseif key == "d" then
-    action(player, player.x+1, player.y)
-  elseif key == "q" then
-    game.mode = "ABILITY"
-  elseif key == "e" then
-    game.mode = "MOVE"
-  elseif key == " " then
-    main()
-  end
-end
-
-function keyWelcome(key)
-  if key == "x" then
-    love.event.quit()
-  elseif key == "1" then
-    game.screen = "TUTORIAL"
-  elseif key == "2" then
+  if keyListener ~= nil then
+    keyListener(key)
   end
 end
 
 function love.update(dt)
 end
 
+drawListener = nil
 function love.draw()
-  if game.screen == "WELCOME" then
-    drawWelcome()
-  elseif game.screen == "GAME" then
-    drawGame()
-  elseif game.screen == "TUTORIAL" then
-    drawTutorial()
+  if drawListener ~= nil then
+    drawListener()
   end
 end
 
-drawTutorialFirst = false
+tutorial1 = {init=false}
 function drawTutorial()
-  if drawTutorialFirst == false then
-    drawTutorialFirst = true
+  if tutorial1.init == false then
+    tutorial1.init = true
+    reset()
+    drawListener = drawTutorial
+    keyListener = function(key)
+      if key == "escape" then
+        tutorial1.init = false 
+        main() 
+      elseif key == "w" then
+        action(player, player.x, player.y-1)
+      elseif key == "a" then
+        action(player, player.x-1, player.y)
+      elseif key == "s" then
+        action(player, player.x, player.y+1)
+      elseif key == "d" then
+        action(player, player.x+1, player.y)
+      elseif key == "q" then
+        game.mode = "ABILITY"
+      elseif key == "e" then
+        game.mode = "MOVE"
+      end
+    end
     currentMap = generators.simple(22,8) 
     map.structure = currentMap.map
-    --map.floor[currentMap.startX][currentMap.startY] = tile.sets.game[2] 
     map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
     local ev = events:create("DWN")
     ev.x = currentMap.endX
     ev.y = currentMap.endY
-
     ev.trigger = function(target)
-      print("TIME TO DRAW")
-      drawTutorialFirst = false 
-      reset()
-      drawTutorial()
+      drawTutorial2()
     end
     map.events[currentMap.endX][currentMap.endY] = ev 
     player.hp = 100
@@ -465,7 +423,58 @@ function drawTutorial()
   love.graphics.printf("\n Kill the guard! \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, screenHeight - 200, screenWidth, "left")
 end
 
+tutorial2 = {init=false,selected=1}
+function drawTutorial2()
+  if tutorial2.init == false then
+    reset()
+    drawListener = drawTutorial2
+    tutorial2.init = true
+    keyListener = function(key)
+      if key == "escape" then
+        tutorial2.init = false 
+        main() 
+      elseif key == "n" and tutorial2.selected > 1 then
+        tutorial2.selected = tutorial2.selected - 1 
+      elseif key == "m" and tutorial2.selected < 3 then
+        tutorial2.selected = tutorial2.selected + 1 
+      elseif key == "w" then
+        action(player, player.x, player.y-1)
+      elseif key == "a" then
+        action(player, player.x-1, player.y)
+      elseif key == "s" then
+        action(player, player.x, player.y+1)
+      elseif key == "d" then
+        action(player, player.x+1, player.y)
+      elseif key == "q" then
+        game.mode = "ABILITY"
+      elseif key == "e" then
+        game.mode = "MOVE"
+      end
+    end
+    currentMap = generators.simple(22,8) 
+    map.structure = currentMap.map
+  end
+  drawSelectTile(tutorial2.selected == 1,2,11,tile.sets.longWeapon[2])
+  drawSelectTile(tutorial2.selected == 2,7,11,tile.sets.shortWeapon[2])
+  drawSelectTile(tutorial2.selected == 3,12,11,tile.sets.tool[2])
+  drawGame()
+  love.graphics.setColor(255, 255, 255)
+  local screenWidth, screenHeight = love.window.getDimensions()
+  love.graphics.setFont(gameFont)
+  love.graphics.printf("\n Break out of jail! \n\n Use [n] and [m] to cycle between your  pick axe, lock pick and sword to get to the next level.", 25, screenHeight - 200, screenWidth, "left")
+end
+
 function drawWelcome()
+  drawListener = drawWelcome
+  keyListener = function(key)
+    if key == "x" then
+      love.event.quit()
+    elseif key == "1" then
+      drawTutorial()
+    elseif key == "2" then
+      drawTutorial2()
+    end
+  end
   love.graphics.setColor(255, 255, 255)
   local screenWidth, screenHeight = love.window.getDimensions()
   love.graphics.setFont(gameFont)
@@ -501,32 +510,36 @@ function drawGame()
   drawTileset(map.gui_3)
 end
 
-function drawSelectTile(x,y,t)
-  map.gui_1[x    ][y    ] = tile.sets.gui[1]
-  map.gui_1[x    ][y + 1] = tile.sets.gui[2]
-  map.gui_1[x    ][y + 2] = tile.sets.gui[2]
-  map.gui_1[x    ][y + 3] = tile.sets.gui[2]
-  map.gui_1[x + 1][y    ] = tile.sets.gui[3]
-  map.gui_1[x + 2][y    ] = tile.sets.gui[3]
-  map.gui_1[x + 3][y    ] = tile.sets.gui[3]
-  map.gui_1[x + 4][y    ] = tile.sets.gui[4]
-  map.gui_1[x + 4][y + 1] = tile.sets.gui[5]
-  map.gui_1[x + 4][y + 2] = tile.sets.gui[5]
-  map.gui_1[x + 4][y + 3] = tile.sets.gui[5]
-  map.gui_1[x + 4][y + 4] = tile.sets.gui[6]
-  map.gui_1[x + 3][y + 4] = tile.sets.gui[7]
-  map.gui_1[x + 2][y + 4] = tile.sets.gui[7]
-  map.gui_1[x + 1][y + 4] = tile.sets.gui[7]
-  map.gui_1[x    ][y + 4] = tile.sets.gui[8]
-  map.gui_1[x + 1][y + 3] = tile.sets.gui[9]
-  map.gui_1[x + 1][y + 2] = tile.sets.gui[9]
-  map.gui_1[x + 1][y + 1] = tile.sets.gui[9]
-  map.gui_1[x + 2][y + 3] = tile.sets.gui[9]
-  map.gui_1[x + 2][y + 2] = tile.sets.gui[9]
-  map.gui_1[x + 2][y + 1] = tile.sets.gui[9]
-  map.gui_1[x + 3][y + 3] = tile.sets.gui[9]
-  map.gui_1[x + 3][y + 2] = tile.sets.gui[9]
-  map.gui_1[x + 3][y + 1] = tile.sets.gui[9]
+function drawSelectTile(selected,x,y,t)
+  local m = 0
+  if selected then
+    m = 9
+  end
+  map.gui_1[x    ][y    ] = tile.sets.gui[1+m]
+  map.gui_1[x    ][y + 1] = tile.sets.gui[2+m]
+  map.gui_1[x    ][y + 2] = tile.sets.gui[2+m]
+  map.gui_1[x    ][y + 3] = tile.sets.gui[2+m]
+  map.gui_1[x + 1][y    ] = tile.sets.gui[3+m]
+  map.gui_1[x + 2][y    ] = tile.sets.gui[3+m]
+  map.gui_1[x + 3][y    ] = tile.sets.gui[3+m]
+  map.gui_1[x + 4][y    ] = tile.sets.gui[4+m]
+  map.gui_1[x + 4][y + 1] = tile.sets.gui[5+m]
+  map.gui_1[x + 4][y + 2] = tile.sets.gui[5+m]
+  map.gui_1[x + 4][y + 3] = tile.sets.gui[5+m]
+  map.gui_1[x + 4][y + 4] = tile.sets.gui[6+m]
+  map.gui_1[x + 3][y + 4] = tile.sets.gui[7+m]
+  map.gui_1[x + 2][y + 4] = tile.sets.gui[7+m]
+  map.gui_1[x + 1][y + 4] = tile.sets.gui[7+m]
+  map.gui_1[x    ][y + 4] = tile.sets.gui[8+m]
+  map.gui_1[x + 1][y + 3] = tile.sets.gui[9+m]
+  map.gui_1[x + 1][y + 2] = tile.sets.gui[9+m]
+  map.gui_1[x + 1][y + 1] = tile.sets.gui[9+m]
+  map.gui_1[x + 2][y + 3] = tile.sets.gui[9+m]
+  map.gui_1[x + 2][y + 2] = tile.sets.gui[9+m]
+  map.gui_1[x + 2][y + 1] = tile.sets.gui[9+m]
+  map.gui_1[x + 3][y + 3] = tile.sets.gui[9+m]
+  map.gui_1[x + 3][y + 2] = tile.sets.gui[9+m]
+  map.gui_1[x + 3][y + 1] = tile.sets.gui[9+m]
   map.gui_2[x + 1][y + 1] = t 
 end
 
