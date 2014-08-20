@@ -18,28 +18,13 @@ function tile.graphics.draw(t,x,y,m)
   if t == nil or t == 0 then
     return
   end
-
-  if t.draw ~= nil then
-    t.draw(x,y)
-
-  elseif t.tile ~= nil and type(t.tile) == "table" then
-    if m == nil then
-      m = t.tile.mdf
-    end
-    if m == nil then
-      m = game.mdf
-    end
-    love.graphics.draw(t.tile.sprite,t.tile.quad,x*game.sz,y*game.sz,0,m,m)
-
-  else
-    if m == nil then
-      m = t.mdf
-    end
-    if m == nil then
-      m = game.mdf
-    end
-    love.graphics.draw(t.sprite,t.quad,x*game.sz,y*game.sz,0,m,m)
+  if m == nil then
+    m = t.mdf
   end
+  if m == nil then
+    m = game.mdf
+  end
+  love.graphics.draw(t.sprite,t.quad,x*game.sz,y*game.sz,0,m,m)
 end
 
 tile.sets = {}
