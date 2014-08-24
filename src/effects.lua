@@ -1,52 +1,86 @@
-function effect(typ,tile,tar,targetX,targetY)
-  if typ == "DAMAGE" then
-    map.effects[targetX][targetY] = {type=typ,tile=tile,draw=effectDamage,start=10,target=tar} 
-  elseif typ == "DEFEND" then
-    map.effects[targetX][targetY] = {type=typ,tile=tile,draw=effectDefend,start=10,target=tar} 
+effect = {}
+effect.db = {}
+function effect:get(id) 
+  return self.db[id]
+end
+function effect:create(id) 
+  local ef = {}
+  ef.id = id
+  ef.type = nil
+  ef.tile = nil
+  ef.timer = 10
+  ef.target = nil
+  function ef:trigger(dt)
+    if dt.timer ~= nil then
+      dt.timer = dt.timer + 1
+    end
+    if self._trigger ~= nil then
+      return self:_trigger(dt)
+    end
+    return dt
   end
+  function ef:init(scene,x,y,target)
+    if self._init ~= nil then
+      return self:_init(scene,x,y,target)
+    end
+    return {timer=0,effect=self,x=x,y=y,target=target}
+  end
+  self.db[id] = ef
+  return ef
 end
 
-function effectDefend(x, y)
-  local dt = map.effects[x][y]
-  love.graphics.setColor(255,255,255,255)
-
-  love.graphics.setBlendMode("alpha")
-  if (dt.start % 2) == 0 then
-    love.graphics.setColor(0,0,0,255)
-  else
-    love.graphics.setColor(0,0,0,255)
-  end
-  tile.graphics.draw(dt.target.tile,x,y)
-
-  love.graphics.setColor(255, 255,255,255)
-  tile.graphics.draw(tile.sets.shield[1],x,y)
-
-  dt.start = dt.start - 1 
-  if(dt.start < 1) then
-    map.effects[x][y] = nil
-  end
-  love.graphics.setColor(255,255,255,255)
+function effect:get(id)
+  return effect.db[id]
 end
 
-function effectDamage(x, y)
-  local dt = map.effects[x][y]
-  love.graphics.setColor(255,255,255,255)
+function effect.main() 
+  local efdmg = effect:create("DAMAGE")
+  function efdmg:_trigger(dt)
+    local x = dt.x
+    local y = dt.y
+    --effect("DAMAGE",map,tile.sets.longWeapon[1],defender,defender.x,defender.y)
+    if(dt.timer > 20) then
+      return false
+    end
+    love.graphics.setColor(255,255,255,255)
+    love.graphics.setBlendMode("alpha")
 
-  love.graphics.setBlendMode("alpha")
-  if (dt.start % 2) == 0 then
-    love.graphics.setColor(255,0,0,255)
-  else
-    love.graphics.setColor(0,0,0,255)
+    if (dt.timer % 2) == 0 then
+      love.graphics.setColor(255,0,0,255)
+    else
+      love.graphics.setColor(0,0,0,255)
+    end
+    tile.graphics.draw(dt.target.tile,x,y)
+
+    love.graphics.setColor(255, 255,255,255)
+    tile.graphics.draw(tile.sets.longWeapon[1],x,y)
+
+    dt.timer = dt.timer + 1 
+    love.graphics.setColor(255,255,255,255)
+
   end
-  tile.graphics.draw(dt.target.tile,x,y)
+  local efdfnd = effect:create("DEFEND")
+  function efdfnd:_trigger(dt)
+    local x = dt.x
+    local y = dt.y
+    if(dt.timer > 20) then
+      return false
+    end
+    love.graphics.setColor(255,255,255,255)
+    love.graphics.setBlendMode("alpha")
 
-  love.graphics.setColor(255, 255,255,255)
-  tile.graphics.draw(map.effects[x][y].tile,x,y)
+    if (dt.timer % 2) == 0 then
+      love.graphics.setColor(255,0,0,255)
+    else
+      love.graphics.setColor(0,0,0,255)
+    end
+    tile.graphics.draw(dt.target.tile,x,y)
 
-  dt.start = dt.start - 1 
-  if(dt.start < 1) then
-    map.effects[x][y] = nil
+    love.graphics.setColor(255, 255,255,255)
+    tile.graphics.draw(tile.sets.shield[1],x,y)
+
+    dt.timer = dt.timer + 1 
+    love.graphics.setColor(255,255,255,255)
+
   end
-  love.graphics.setColor(255, 255,255,255)
 end
-

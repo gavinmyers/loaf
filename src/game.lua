@@ -13,10 +13,10 @@ game.h = game.sz * (game.dwn + 2) -- window size in pixels (height)
 game.mode = nil
 
 -- current view settings
-game.screen = "WELCOME"
+game.screen = nil
 
 -- game methods
-function combat(attacker,defender)
+function game:combat(attacker,defender)
   local ability = attacker.ability
   local attackRoll = ability:attack(attacker,defender)
   for i = 1, #attacker.abilities do
@@ -33,13 +33,13 @@ function combat(attacker,defender)
   end
 
   if attackRoll > defendRoll then
-    return damage(attacker,defender)
+    return self:damage(attacker,defender)
   else
     return false
   end
 end
 
-function damage(attacker,defender)
+function game:damage(attacker,defender)
   local ability = attacker.ability
   local damageRoll = ability:damage(attacker,defender)
   for i = 1, #attacker.abilities do
@@ -67,15 +67,16 @@ function damage(attacker,defender)
     return false
   end
 end
-function action(who,targetX,targetY) 
-  if targetX < 2 or targetX > game.acs -1 then 
-  elseif targetY < 2 or targetY > game.dwn -1 then
-  elseif game.mode == nil or game.mode == "" or game.mode == "MOVE" then
+function game:action(who,targetX,targetY) 
+  local map = self.screen.map
+  if targetX < 2 or targetX > self.acs -1 then 
+  elseif targetY < 2 or targetY > self.dwn -1 then
+  elseif self.mode == nil or self.mode == "" or self.mode == "MOVE" then
     if map.structure[targetX][targetY] ~= nil then
     elseif map.creatures[targetX][targetY] ~= nil then
       if map.creatures[targetX][targetY].hostile == true then
-        game.mode = "ABILITY"
-        action(who,targetX,targetY)
+        self.mode = "ABILITY"
+        self:action(who,targetX,targetY)
       end
     elseif map.events[targetX][targetY] ~= nil then
       map.events[targetX][targetY].trigger(who)
@@ -85,18 +86,17 @@ function action(who,targetX,targetY)
       who.y = targetY
       map.creatures[who.x][who.y] = who
     end
-  elseif game.mode == "ABILITY" then
+  elseif self.mode == "ABILITY" then
     if map.creatures[targetX][targetY] ~= nil then
-
       local attacker = who
       local defender = map.creatures[targetX][targetY]
-      if combat(attacker,defender) then
-        effect("DAMAGE",tile.sets.longWeapon[1],defender,defender.x,defender.y)
+      if self:combat(attacker,defender) then
+        self.screen:addEffect("DAMAGE",targetX,targetY,attacker,defender)
       else
-        effect("DEFEND",tile.sets.longWeapon[1],defender,defender.x,defender.y)
+        self.screen:addEffect("DEFEND",targetX,targetY,attacker,defender)
       end
     end
-    game.mode = "MOVE" 
+    self.mode = "MOVE" 
   end
 end
 
