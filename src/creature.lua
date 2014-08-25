@@ -2,6 +2,7 @@ creature = {}
 creature.db = {}
 function creature:remove(id)
   local cr = self.db[id]
+  --don't like this...
   game.screen.map.creatures[cr.x][cr.y] = nil
   self.db[id] = nil
 end

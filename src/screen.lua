@@ -161,9 +161,9 @@ function screen.main()
     goblin.y = currentMap.endY
     goblin.tile = tile.sets.player[2]
     goblin.hp = 5000
-    goblin.attack = 1
-    goblin.defend = 1 
-    goblin.damage = 2
+    goblin.attack = 0 
+    goblin.defend = 6 
+    goblin.damage = 0 
     self.map.creatures[player.x][player.y] = player
     self.map.creatures[goblin.x][goblin.y] = goblin 
   end
