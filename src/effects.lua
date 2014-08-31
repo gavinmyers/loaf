@@ -81,6 +81,5 @@ function effect.main()
 
     dt.timer = dt.timer + 1 
     love.graphics.setColor(255,255,255,255)
-
   end
 end

@@ -154,8 +154,28 @@ function screen.main()
     player.x = currentMap.startX
     player.y = currentMap.startY
     player.tile = tile.sets.player[1]
-    player.abilities[1] = longSwordAbility
-    player.ability = longSwordAbility
+
+    local longsword = ability:create("LS")
+    function longsword:_attack(attacker,defender)
+      local base = attacker.attack
+      local mod = 2
+      local dice = base + mod
+      return math.random(1,dice * 6)
+    end
+    function longsword:_damage(attacker,defender)
+      local base = attacker.damage
+      local mod = 2
+      local dice = base + mod
+      return math.random(1,dice * 6)
+    end
+    local stab = modifier:create("TB")
+    function stab:_damageMod(ability,attacker,defender)
+      return 1000
+    end
+    longsword.modifiers[1] = stab
+
+    player.abilities[1] = longsword
+    player.ability = longsword
     local goblin = creature:create("GOBLIN",self) 
     goblin.x = currentMap.endX
     goblin.y = currentMap.endY
@@ -198,24 +218,99 @@ function screen.main()
   local t2scr = screen:create("TUTORIAL_2")
   t2scr.data = {selected=1}
   function t2scr:_init()
-    currentMap = generators.simple(22,8) 
+    local currentMap = generators.tutorial2(22,8) 
     self.map.structure = currentMap.map
+
+    local lockpick = ability:create("LP")
+    function lockpick:_use(target)
+      if target.locked ~= nil and target.locked == true then
+        target.locked = false
+        game:announce("You use the lockpick to pick the " .. target.id)
+      end
+    end
+    self.lockpick = lockpick
+    
+    local longsword = ability:create("LS")
+    local pick = ability:create("PCK")
+    local bow = ability:create("BOW")
+
+    local player = creature:create("PLAYER",self) 
+    player.abilities[1] = longsword
+    player.abilities[2] = pick 
+    player.abilities[3] = lockpick 
+    player.abilities[4] = bow 
+
+    self.player = player
+
+    player.x = currentMap.startX
+    player.y = currentMap.startY
+    player.tile = tile.sets.player[1]
+    self.map.creatures[player.x][player.y] = player
+    local d
+
+    local goblin = creature:create("GOBLIN1",self) 
+    goblin.x = 10 
+    goblin.y = 5 
+    goblin.tile = tile.sets.player[2]
+    goblin.hp = 5000
+    goblin.attack = 0 
+    goblin.defend = 6 
+    goblin.damage = 0 
+    self.map.creatures[goblin.x][goblin.y] = goblin 
+
+    local goblin = creature:create("GOBLIN2",self) 
+    goblin.x = 9 
+    goblin.y = 5 
+    goblin.tile = tile.sets.player[2]
+    goblin.hp = 5000
+    goblin.attack = 0 
+    goblin.defend = 6 
+    goblin.damage = 0 
+    self.map.creatures[goblin.x][goblin.y] = goblin 
+
+    local goblin = creature:create("GOBLIN3",self) 
+    goblin.x = 8 
+    goblin.y = 5 
+    goblin.tile = tile.sets.player[2]
+    goblin.hp = 5000
+    goblin.attack = 0 
+    goblin.defend = 6 
+    goblin.damage = 0 
+    self.map.creatures[goblin.x][goblin.y] = goblin 
+
+    local d = door:create("D1",self,"wood",false,false) 
+    d.x = 3 
+    d.y = 3 
+    self.map.items[d.x][d.y] = d 
+
+    d = door:create("D2",self,"wood",false,true) 
+    d.x = 5 
+    d.y = 6 
+    self.map.items[d.x][d.y] = d 
+
+    d = door:create("D3",self,"wood",false,true) 
+    d.x = 7 
+    d.y = 6 
+    self.map.items[d.x][d.y] = d 
+
   end
   function t2scr:_draw()
     self:drawSelectTile(self.data.selected == 1,2,11,tile.sets.longWeapon[2])
     self:drawSelectTile(self.data.selected == 2,7,11,tile.sets.shortWeapon[2])
     self:drawSelectTile(self.data.selected == 3,12,11,tile.sets.tool[2])
+    self:drawSelectTile(self.data.selected == 4,17,11,tile.sets.ammo[2])
     love.graphics.setColor(255, 255, 255)
+    game:announce()
     local screenWidth, screenHeight = love.window.getDimensions()
     love.graphics.setFont(gameFont)
-    love.graphics.printf("\n Break out of jail! \n\n Use [n] and [m] to cycle between your  pick axe, lock pick and sword to get to the next level.", 25, screenHeight - 200, screenWidth, "left")
+    love.graphics.printf("\n Break out of jail! \n\n Use [n] and [m] to cycle between your  pick axe, lock pick, bow and sword to get to the next level. \n Fire your bow with the [.] key.", 25, screenHeight - 200, screenWidth, "left")
   end
   function t2scr:_keypressed(key)
     if key == "escape" then
       main() 
     elseif key == "n" and self.data.selected > 1 then
       self.data.selected = self.data.selected - 1 
-    elseif key == "m" and self.data.selected < 3 then
+    elseif key == "m" and self.data.selected < 4 then
       self.data.selected = self.data.selected + 1 
     elseif key == "w" then
       game:action(self.player, self.player.x, self.player.y-1)
@@ -230,6 +325,8 @@ function screen.main()
     elseif key == "e" then
       game.mode = "MOVE"
     end
+
+    self.player.ability = self.player.abilities[self.data.selected] 
   end
   function t2scr:drawSelectTile(selected,x,y,t)
     local m = 0
@@ -263,6 +360,4 @@ function screen.main()
     self.map.gui_1[x + 3][y + 1] = tile.sets.gui[9+m]
     self.map.gui_2[x + 1][y + 1] = t 
   end
-
-
 end

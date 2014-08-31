@@ -15,6 +15,15 @@ game.mode = nil
 -- current view settings
 game.screen = nil
 
+game.lastMessage = ""
+function game:announce(message)
+  if message ~= nil then
+    self.lastMessage = message
+  end
+  local screenWidth, screenHeight = love.window.getDimensions()
+  love.graphics.printf(self.lastMessage, 25, screenHeight - 50, screenWidth, "left")
+end
+
 -- game methods
 function game:combat(attacker,defender)
   local ability = attacker.ability
@@ -73,19 +82,34 @@ function game:action(who,targetX,targetY)
   elseif targetY < 2 or targetY > self.dwn -1 then
   elseif self.mode == nil or self.mode == "" or self.mode == "MOVE" then
     if map.structure[targetX][targetY] ~= nil then
+      return
     elseif map.creatures[targetX][targetY] ~= nil then
       if map.creatures[targetX][targetY].hostile == true then
         self.mode = "ABILITY"
         self:action(who,targetX,targetY)
       end
+      return
+    elseif map.items[targetX][targetY] ~= nil then
+      local ability = who.ability
+      local itm = map.items[targetX][targetY]
+      local r1 = true
+      if ability ~= nil then
+        r1 = ability:use(itm)
+      end
+      local r2 = itm:interact(who) 
+      if r1 == false or r2 == false then
+        return
+      end
     elseif map.events[targetX][targetY] ~= nil then
-      map.events[targetX][targetY].trigger(who)
-    else
-      map.creatures[who.x][who.y] = nil 
-      who.x = targetX
-      who.y = targetY
-      map.creatures[who.x][who.y] = who
+      local r = map.events[targetX][targetY].trigger(who)
+      if r == false then
+        return
+      end
     end
+    map.creatures[who.x][who.y] = nil 
+    who.x = targetX
+    who.y = targetY
+    map.creatures[who.x][who.y] = who
   elseif self.mode == "ABILITY" then
     if map.creatures[targetX][targetY] ~= nil then
       local attacker = who

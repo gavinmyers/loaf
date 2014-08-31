@@ -1,11 +1,13 @@
 require "resources/DawnLike_1/Objects/Floor"
 require "resources/DawnLike_1/Objects/Tile"
 require "resources/DawnLike_1/Objects/Wall"
+require "resources/DawnLike_1/Objects/Door"
 require "resources/DawnLike_1/Items/LongWep"
 require "resources/DawnLike_1/Items/ShortWep"
 require "resources/DawnLike_1/Items/Tool"
 require "resources/DawnLike_1/Items/Shield"
 require "resources/DawnLike_1/Items/Scroll"
+require "resources/DawnLike_1/Items/Ammo"
 require "resources/DawnLike_1/Characters/Player"
 require "resources/DawnLike_1/GUI/GUI0"
 
@@ -30,6 +32,7 @@ end
 tile.sets = {}
 function tile.main() 
   tile.sets.floor = resources.floor()
+  tile.sets.door = resources.door()
   tile.sets.wall = resources.wall()
   tile.sets.game = resources.tile()
   tile.sets.player = resources.player()
@@ -39,5 +42,6 @@ function tile.main()
   tile.sets.shield = resources.shield()
   tile.sets.scroll = resources.scroll()
   tile.sets.gui = resources.gui()
+  tile.sets.ammo = resources.ammo()
 end
 

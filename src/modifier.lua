@@ -45,9 +45,4 @@ function modifier:create(id)
   return newModifier
 end
 
-stabTown = modifier:create("TB")
-function stabTown:_damageMod(ability,attacker,defender)
-  return 1000
-end
-longSwordAbility.modifiers[1] = stabTown
 

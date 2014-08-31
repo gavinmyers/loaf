@@ -8,6 +8,7 @@ function ability:create(id)
     if self._use ~= nil then
       return self:_use(target)
     end
+    return true
   end
 
   function newAbility:useMod(ability,target)
@@ -85,19 +86,5 @@ function ability:create(id)
   return newAbility
 end
 
-longSwordAbility = ability:create("LS")
-function longSwordAbility:_attack(attacker,defender)
-  local base = attacker.attack
-  local mod = 2
-  local dice = base + mod
-  return math.random(1,dice * 6)
-end
-
-function longSwordAbility:_damage(attacker,defender)
-  local base = attacker.damage
-  local mod = 2
-  local dice = base + mod
-  return math.random(1,dice * 6)
-end
 
 
