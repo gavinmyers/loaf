@@ -8,9 +8,7 @@ function creature:remove(id)
 end
 
 function creature:create(id,screen) 
-  local nc = {}
-  nc.id = id
-  nc.screen = screen 
+  local nc = item:create(id,screen) 
   nc.hostile = true
   nc.hp = 1
   nc.attack = 0
@@ -19,8 +17,6 @@ function creature:create(id,screen)
   nc.soak = 0
   nc.damage = 0
   nc.abilities = {}
-  nc.x = 1 
-  nc.y = 1 
   nc.tile = nil
   function nc:die()
     creature:remove(self.id)
