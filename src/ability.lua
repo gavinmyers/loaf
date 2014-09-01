@@ -18,7 +18,7 @@ function ability:create(id)
   end
 
   function newAbility:attack(attacker,defender)
-    local res = false
+    local res = 0 
     if self._attack ~= nil then
       res = self:_attack(attacker,defender)
     end
@@ -30,15 +30,19 @@ function ability:create(id)
   end
 
   function newAbility:attackMod(ability,attacker,defender)
+    local res = 0
     if self._attackMod ~= nil then
-      return self:_attackMod(ability,attacker,defender)
+      res = self:_attackMod(ability,attacker,defender)
     end
+    return res
   end
 
   function newAbility:defend(attacker,defender)
+    local res = 0
     if self._defend ~= nil then
-      return self:_defend(attacker,defender)
+      res = self:_defend(attacker,defender)
     end
+    return res
   end
 
   function newAbility:defendMod(ability,attacker,defender)
