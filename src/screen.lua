@@ -21,11 +21,6 @@ function _screen()
     sc.id = id
     screen.db[sc.id] = sc
     function sc:keypressed(key)
-      local x = 0
-      for k,v in pairs(_G) do
-        x = x + 1
-      end
-      if x > 68 then error("NEW GLOBAL") end
       if self._keypressed ~= nil then
         return self:_keypressed(key)
       end
@@ -37,6 +32,11 @@ function _screen()
     end
 
     function sc:draw()
+      local x = 0
+      for k,v in pairs(_G) do
+        x = x + 1
+      end
+      if x > 68 then error("NEW GLOBAL") end
       if self._draw ~= nil then
         self:_draw()
       end
