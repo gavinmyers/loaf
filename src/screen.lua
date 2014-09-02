@@ -5,6 +5,7 @@ function _screen()
   local ability = require "ability"
   local modifier = require "modifier"
   local item = require "item"
+  local door = require "door"
   local tile = require "tile"
   local event = require "event"
   local effect = require "effects"
