@@ -1,12 +1,16 @@
-local split = function(f,w,h)
-  local q = love.graphics.newQuad(w, h, 16, 16, 256, 288)
-  return tile.create(f,q)
-end
-if resources == nil then
-  resources = {}
-end
+local function init()
+  local game = require "game"
+  local function create(img,q) 
+    return {sprite=img,quad=q,mdf=game.mdf}
+  end
+  local split = function(f,w,h)
+    local q = love.graphics.newQuad(w, h, 16, 16, 256, 288)
+    return create(f,q)
+  end
+  if resources == nil then
+    resources = {}
+  end
 
-function resources.gui() 
   local d = {}
   d[1] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),208,96)
   d[2] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),208,112)
@@ -27,7 +31,6 @@ function resources.gui()
   d[16] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),160,128)
   d[17] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),144,128)
   d[18] = split(love.graphics.newImage("resources/DawnLike_1/GUI/GUI0.png"),160,112)
-
-
   return d 
 end
+return init()

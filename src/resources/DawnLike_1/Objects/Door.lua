@@ -1,10 +1,11 @@
-if resources == nil then
-  resources = {}
-end
-function resources.door() 
+function init() 
+  local game = require "game"
+  local function create(img,q) 
+    return {sprite=img,quad=q,mdf=game.mdf}
+  end
   local split = function(f,w,h)
     local q = love.graphics.newQuad(w, h, 16, 16, 128, 80)
-    return tile.create(f,q)
+    return create(f,q)
   end
 
   local d = {}
@@ -13,3 +14,4 @@ function resources.door()
   d[3]  = split(love.graphics.newImage("resources/DawnLike_1/Objects/Door1.png"),0,0)
   return d 
 end
+return init()

@@ -1,12 +1,13 @@
-local split = function(f,w,h)
-  local q = love.graphics.newQuad(w, h, 16, 16, 128, 112)
-  return tile.create(f,q)
-end
-if resources == nil then
-  resources = {}
-end
+local function init() 
+  local game = require "game"
+  local function create(img,q) 
+    return {sprite=img,quad=q,mdf=game.mdf}
+  end
+  local split = function(f,w,h)
+    local q = love.graphics.newQuad(w, h, 16, 16, 128, 112)
+    return create(f,q)
+  end
 
-function resources.longWeapon() 
   local d = {}
   d[1]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),32,16)
   d[2]  = split(love.graphics.newImage("resources/DawnLike_1/Items/LongWep.png"),32,16)
@@ -25,3 +26,4 @@ function resources.longWeapon()
   d[8].mdf = 6 
   return d 
 end
+return init()
