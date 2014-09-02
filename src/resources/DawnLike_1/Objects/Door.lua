@@ -1,4 +1,4 @@
-function init() 
+local function init() 
   local game = require "game"
   local function create(img,q) 
     return {sprite=img,quad=q,mdf=game.mdf}

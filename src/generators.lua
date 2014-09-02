@@ -91,7 +91,7 @@ function _generators()
     for p = 1, 4 do
       for x = 1, acs do
         for y = 1, dwn do
-          t = m[x][y]
+          local t = m[x][y]
           if t == nil then 
             if x > 2 and x < acs - 1 then
               if math.random(1,6) > 3 then
