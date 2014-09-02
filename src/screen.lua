@@ -8,6 +8,7 @@ function _screen()
   local tile = require "tile"
   local event = require "event"
   local effect = require "effects"
+  local events = require "event"
   local screen = {}
   function screen:current(id)
     local sc = screen.db[id]
@@ -19,8 +20,10 @@ function _screen()
     sc.id = id
     screen.db[sc.id] = sc
     function sc:keypressed(key)
+      print("******************************************")
+      print("******************************************")
       for k,v in pairs(_G) do
-        --print("Global key", k)
+        print("Global key", k)
       end
       if self._keypressed ~= nil then
         return self:_keypressed(key)
