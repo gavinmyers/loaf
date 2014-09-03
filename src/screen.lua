@@ -11,6 +11,14 @@ function _screen()
   local effect = require "effect"
   local event = require "event"
   local screen = {}
+
+  function screen.main() 
+    screen.db = {}
+    local welcome = require "screens/welcome" (screen)
+    local t1 = require "screens/tutorial1" (screen)
+    local t2 = require "screens/tutorial2" (screen)
+  end
+
   function screen:current(id)
     local sc = screen.db[id]
     sc:init()
@@ -130,12 +138,6 @@ function _screen()
     return sc
   end
 
-  function screen.main() 
-    screen.db = {}
-    local welcome = require "screens/welcome" (screen)
-    local t1 = require "screens/tutorial1" (screen)
-    local t2 = require "screens/tutorial2" (screen)
-  end
   return screen
 end
 
