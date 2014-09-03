@@ -1,19 +1,19 @@
-function _generators()
+function _generator()
   local game = require "game"
   local tile = require "tile"
-  local generators = {}
-  function generators.edges(m,set) 
+  local generator = {}
+  function generator.edges(m,set) 
     for x = 1, game.acs do
       for y = 1, game.dwn do
         if m[x][y] ~= nil then
-          m[x][y] = set[generators.edge(m,x,y)]
+          m[x][y] = set[generator.edge(m,x,y)]
         end
       end
     end
     return m
   end
 
-  function generators.edge(m,x,y)
+  function generator.edge(m,x,y)
     local eN, eS, eE, eW = nil
     eN = m[x][y-1] 
     eS = m[x][y+1] 
@@ -74,7 +74,7 @@ function _generators()
   end
 
   -- should be a complete (if boring) map
-  function generators.simple(acs,dwn) 
+  function generator.simple(acs,dwn) 
     acs = acs or game.acs
     dwn = dwn or game.dwn
     local m = {} 
@@ -153,12 +153,12 @@ function _generators()
     end
     ex = cx
     ey = cy
-    m = generators.edges(m,tile.sets.wall[1])
+    m = generator.edges(m,tile.sets.wall[1])
     return {map=m,startX=sx,startY=sy,endX=ex,endY=ey}
   end
 
 
-  function generators.empty(acs,dwn) 
+  function generator.empty(acs,dwn) 
     acs = acs or game.acs
     dwn = dwn or game.dwn
     local m = {} 
@@ -172,10 +172,10 @@ function _generators()
         end
       end
     end
-    m = generators.edges(m,tile.sets.wall[1])
+    m = generator.edges(m,tile.sets.wall[1])
     return {map=m,startX=2,startY=2,endX=acs-1,endY=dwn-1}
   end
-  function generators.static()
+  function generator.static()
     local acs = 22 
     local dwn = 8 
     local l = {
@@ -212,11 +212,11 @@ function _generators()
         end
       end
     end
-    m = generators.edges(m,tile.sets.wall[1])
+    m = generator.edges(m,tile.sets.wall[1])
     return {map=m,startX=2,startY=2,endX=acs-1,endY=dwn-1}
 
   end
-  function generators.tutorial2()
+  function generator.tutorial2()
     local acs = 22 
     local dwn = 8 
     local l = {
@@ -253,16 +253,16 @@ function _generators()
         end
       end
     end
-    m = generators.edges(m,tile.sets.wall[1])
+    m = generator.edges(m,tile.sets.wall[1])
     return {map=m,startX=2,startY=2,endX=acs-1,endY=dwn-1}
 
   end
-  return generators
+  return generator
 end
-if __generators ~= nil then
-  return __generators
+if __generator ~= nil then
+  return __generator
 else
-  __generators = _generators()
-  return __generators
+  __generator = _generator()
+  return __generator
 end
 

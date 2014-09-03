@@ -1,14 +1,14 @@
 function _screen()
   local game = require "game"
   local creature = require "creature"
-  local generators = require "generators"
+  local generator = require "generator"
   local ability = require "ability"
   local modifier = require "modifier"
   local item = require "item"
   local door = require "door"
   local tile = require "tile"
   local event = require "event"
-  local effect = require "effects"
+  local effect = require "effect"
   local events = require "event"
   local screen = {}
   function screen:current(id)
@@ -62,7 +62,7 @@ function _screen()
       self.map.structure = {}
       self.map.items = {}
       self.map.creatures = {}
-      self.map.effects = {}
+      self.map.effect = {}
       self.map.gui_1 = {}
       self.map.gui_2 = {}
       self.map.gui_3 = {}
@@ -72,7 +72,7 @@ function _screen()
         self.map.structure[x] = {}
         self.map.creatures[x] = {}
         self.map.items[x] = {}
-        self.map.effects[x] = {}
+        self.map.effect[x] = {}
         self.map.gui_1[x] = {}
         self.map.gui_2[x] = {}
         self.map.gui_3[x] = {}
@@ -84,15 +84,15 @@ function _screen()
     end
     function sc:addEffect(id,x,y,source,target)
       local ef = effect:get(id)
-      local m = self.map.effects[x][y]
+      local m = self.map.effect[x][y]
       if m == nil then
         m = {}
       end
       m[#m+1] = ef:init(self,x,y,source,target) 
-      self.map.effects[x][y] = m 
+      self.map.effect[x][y] = m 
     end
     function sc:drawEffects()
-      local ts = self.map.effects
+      local ts = self.map.effect
       for x = 1, game.acs do
         if ts[x] ~= nil then
           for y = 1, game.dwn do
@@ -152,7 +152,7 @@ function _screen()
     local t1scr = screen:create("TUTORIAL_1")
     t1scr.data = {}
     function t1scr:_init()
-      currentMap = generators.simple(22,8) 
+      currentMap = generator.simple(22,8) 
       self.map.structure = currentMap.map
       self.map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
       local ev = events:create("DWN")
@@ -235,7 +235,7 @@ function _screen()
     local t2scr = screen:create("TUTORIAL_2")
     t2scr.data = {selected=1}
     function t2scr:_init()
-      local currentMap = generators.tutorial2(22,8) 
+      local currentMap = generator.tutorial2(22,8) 
       self.map.structure = currentMap.map
 
       local lockpick = ability:create("LP")

@@ -4,7 +4,7 @@ love.graphics.setDefaultFilter("nearest","nearest")
 function main()
   local game = require "game"
   local screen = require "screen"
-  local effect = require "effects"
+  local effect = require "effect"
   math.randomseed(os.time())
   love.window.setMode(game.w, game.h)
   effect.main()
