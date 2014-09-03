@@ -106,8 +106,8 @@ function _game()
         if r1 == false or r2 == false then
           return
         end
-      elseif map.events[targetX][targetY] ~= nil then
-        local r = map.events[targetX][targetY].trigger(who)
+      elseif map.event[targetX][targetY] ~= nil then
+        local r = map.event[targetX][targetY].trigger(who)
         if r == false then
           return
         end
