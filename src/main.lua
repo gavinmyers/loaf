@@ -1,8 +1,7 @@
 local inspect = require "lib/inspect"
-
+local game = require "game"
 love.graphics.setDefaultFilter("nearest","nearest")
 function main()
-  local game = require "game"
   local screen = require "screen"
   local effect = require "effect"
   math.randomseed(os.time())
@@ -12,15 +11,12 @@ function main()
   screen:current("WELCOME")
 end
 function love.keypressed(key)
-  local game = require "game"
   game.screen:keypressed(key)
 end
 function love.update(dt)
-  local game = require "game"
   game.screen:update(dt)
 end
 function love.draw()
-  local game = require "game"
   game.screen:draw()
 end
 function love.load()
