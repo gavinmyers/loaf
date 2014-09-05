@@ -55,6 +55,7 @@ function _screen()
       self:drawMapSet(self.map.gui_1)
       self:drawMapSet(self.map.gui_2)
       self:drawMapSet(self.map.gui_3)
+
     end
 
     function sc:init()

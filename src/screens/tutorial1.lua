@@ -70,6 +70,7 @@ function scn:_draw()
   love.graphics.printf("\n Kill the guard! \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, screenHeight - 200, screenWidth, "left")
 end
 function scn:_keypressed(key)
+  self.changed = true
   if key == "escape" then
     main() 
   elseif key == "n" and self.data.selected > 1 then

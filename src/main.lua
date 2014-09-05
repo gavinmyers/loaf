@@ -8,6 +8,8 @@ function main()
   local x = require "screens/tutorial2" 
 
   local effect = require "effect"
+  local x = require "effects/defend"
+  local x = require "effects/damage"
   
   local generator = require "generator"
   local x = require "generators/empty" 
@@ -17,7 +19,6 @@ function main()
 
   math.randomseed(os.time())
   love.window.setMode(game.w, game.h)
-  effect.main()
   screen:current("WELCOME")
 end
 function love.keypressed(key)
