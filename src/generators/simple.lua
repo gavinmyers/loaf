@@ -75,7 +75,7 @@ function g:generate(acs,dwn)
       cy = cy + 1
     end
     m[cx][cy] = nil
-    if math.random(1,2048) == 1 then
+    if math.random(1,128) == 1 then
       path = true
     end
   end
