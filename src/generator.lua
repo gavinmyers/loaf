@@ -2,11 +2,21 @@ function _generator()
   local game = require "game"
   local tile = require "tile"
   local generator = {}
+  generator.db = {}
 
   require "generators/simple" (generator)
-  require "generators/empty" (generator)
   require "generators/static" (generator)
   require "generators/tutorial2" (generator)
+
+  function generator:create(id)
+    local g = {}
+    self.db[id] = g
+    return g
+  end
+
+  function generator:get(id)
+    return self.db[id] 
+  end
 
   function generator.edges(m,set) 
     for x = 1, game.acs do
