@@ -1,7 +1,5 @@
 local generator = require "generator"
-
 local g = generator:create("EMPTY")
-
 function g:generate(acs,dwn)
   local game = require "game"
   local tile = require "tile"

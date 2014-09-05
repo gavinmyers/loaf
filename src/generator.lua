@@ -4,10 +4,6 @@ function _generator()
   local generator = {}
   generator.db = {}
 
-  require "generators/simple" (generator)
-  require "generators/static" (generator)
-  require "generators/tutorial2" (generator)
-
   function generator:create(id)
     local g = {}
     self.db[id] = g
