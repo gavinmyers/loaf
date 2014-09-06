@@ -4,11 +4,10 @@ local generator = require "generator"
 local ability = require "ability"
 local modifier = require "modifier"
 local item = require "item"
-local door = require "door"
+local door = require "items/door"
 local tile = require "tile"
 local event = require "event"
 local effect = require "effect"
-local event = require "event"
 local screen = require "screen"
 
 local scn = screen:create("TUTORIAL_2")
