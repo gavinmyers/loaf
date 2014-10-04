@@ -16,6 +16,7 @@ function main()
   local x = require "generators/simple" 
   local x = require "generators/static" 
   local x = require "generators/tutorial2" 
+  local x = require "generators/cave1" 
 
   math.randomseed(os.time())
   love.window.setMode(game.w, game.h)

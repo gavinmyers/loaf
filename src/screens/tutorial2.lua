@@ -6,14 +6,12 @@ local modifier = require "modifier"
 local item = require "item"
 local door = require "items/door"
 local tile = require "tile"
-local event = require "event"
-local effect = require "effect"
 local screen = require "screen"
 
 local scn = screen:create("TUTORIAL_2")
 scn.data = {selected=1}
 function scn:_init()
-  local currentMap = generator:get("TUTORIAL_2"):generate(22,8) 
+  local currentMap = generator:get("TUTORIAL_2"):generate() 
   self.map.structure = currentMap.map
 
   local lockpick = ability:create("LP")

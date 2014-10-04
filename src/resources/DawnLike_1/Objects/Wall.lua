@@ -52,6 +52,6 @@ local function init()
   end
   local wallSet0 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Wall.png"),0,0)
   local wallSet1 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Wall.png"),0,48)
-  return {wallSet1}
+  return {wallSet1,wallSet0}
 end
 return init()

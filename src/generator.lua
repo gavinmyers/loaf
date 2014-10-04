@@ -14,9 +14,9 @@ function _generator()
     return self.db[id] 
   end
 
-  function generator.edges(m,set) 
-    for x = 1, game.acs do
-      for y = 1, game.dwn do
+  function generator.edges(acs,dwn,m,set) 
+    for x = 1, acs do
+      for y = 1, dwn do
         if m[x][y] ~= nil then
           m[x][y] = set[generator.edge(m,x,y)]
         end
