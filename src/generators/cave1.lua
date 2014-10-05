@@ -50,6 +50,10 @@ function g:_area(acs,dwn,x,y,m,m2)
   return m2
 
 end
+function g:empty(acs,dwn,x,y,m)
+  return self:cardinals(acs,dwn,x,y,m) + self:neighbors(acs,dwn,x,y,m) == 8 
+end
+
 function g:surrounded(acs,dwn,x,y,m)
   return self:cardinals(acs,dwn,x,y,m) + self:neighbors(acs,dwn,x,y,m) == 0 
 end
@@ -308,117 +312,69 @@ function g:generate(acs,dwn)
           end
         end
       end
-
-
     end
   end
-  m = generator.edges(acs,dwn,m,tile.sets.wall[1])
-  return {map=m,startX=startX,startY=startY,endX=endX,endY=endY}
-end
-function g:generate2(acs,dwn)
-  local game = require "game"
-  local tile = require "tile"
-  acs = acs or game.acs
-  dwn = dwn or game.dwn
-  local m = {} 
-  for x = 1, acs do
-    m[x] = {}
-    for y = 1, dwn do
-      if self:valid(acs,dwn,x,y) then 
-        if math.random(2) == 1 then 
-          m[x][y] = 1 
-        else
-          m[x][y] = nil 
-        end
-      else
-        m[x][y] = 1 
+  for i = 1,24 do
+    local m2 = {}
+    for x = 1, acs do
+      m2[x] = {}
+      for y = 1, dwn do
+        m2[x][y] = {}
       end
     end
-  end
 
-  for t = 1, 9 do
-    for x = 1, acs do
-      for y = 1, dwn do
-        if x > 1 and x < acs and y > 1 and y < dwn then 
-          local n = m[x][y-1] or 0
-          local s = m[x][y+1] or 0
-          local w = m[x-1][y] or 0
-          local e = m[x+1][y] or 0
-          local sum = n + s + e + w
-          if sum < 2 then
-            m[x][y] = nil
-          elseif sum > 3 then
-            m[x][y] = 1 
+    local wX = math.random(acs - 2) + 1
+    local wY = math.random(dwn - 2) + 1
+
+    if self:empty(acs,dwn,wX,wY,m) then
+      m2[wX][wY] = 1
+      local b = true
+      local d = math.random(2)
+      local wX1 = wX
+      local wY1 = wY
+      local wX2 = wX
+      local wY2 = wY
+      while b do
+        if d == 1 then
+          if self:empty(acs,dwn,wX1,wY,m) then
+            m2[wX1][wY] = 1
+            wX1 = wX1 + 1
+          end
+          if self:empty(acs,dwn,wX2,wY,m) then
+            m2[wX2][wY] = 1
+            wX2 = wX2 - 1
+          end
+          if self:empty(acs,dwn,wX1,wY,m) == false and 
+             self:empty(acs,dwn,wX2,wY,m) == false then
+             b = false
+          end
+        else
+          if self:empty(acs,dwn,wX,wY1,m) then
+            m2[wX][wY1] = 1
+            wY1 = wY1 + 1
+          end
+          if self:empty(acs,dwn,wX,wY2,m) then
+            m2[wX][wY2] = 1
+            wY2 = wY2 - 1
+          end
+          if self:empty(acs,dwn,wX,wY1,m) == false and 
+             self:empty(acs,dwn,wX,wY2,m) == false then
+             b = false
+          end
+        end
+      end
+      for x = 1, acs do
+        for y = 1, dwn do
+          if m2[x][y] == 1 then
+            m[x][y] = 1
           end
         end
       end
     end
   end
-
-
-  local counter = 10 
-  for x = 1, acs do
-    for y = 1, dwn do
-      if m[x][y] == nil then
-        m = self:neighbor(acs,dwn,x,y,m,counter)
-        counter = counter + 1
-      end
-    end
-  end
-
-  for t = 1, 2 do
-    for x = 1, acs do
-      for y = 1, dwn do
-        if m[x][y] == 1 then
-          m = self:opposites(acs,dwn,x,y,m)
-        end
-      end
-    end
-
-    for x = 1, acs do
-      for y = 1, dwn do
-        if m[x][y] ~= 1 and self:neighbors(acs,dwn,x,y,m) == 1  then
-          m[x][y] = 1
-        end
-      end
-    end
-  end
-
-  for x = 1, acs do
-    for y = 1, dwn do
-      if m[x][y] ~= 1 and self:neighbors(acs,dwn,x,y,m) == 4 then 
-        if math.random(2) == 1 then 
-          m[x][y] = 1 
-        end
-      end
-    end
-  end
-
-  for t = 1,9 do
-    for x = 1, acs do
-      for y = 1, dwn do
-        if m[x][y] ~= 1 and self:neighbors(acs,dwn,x,y,m) == 1 then 
-          m[x][y] = 1 
-        end
-      end
-    end
-  end
-
-
-  local startX, startY, endX, endY
-  for x = 1, acs do
-    for y = 1, dwn do
-      if m[x][y] ~= 1 then
-        m[x][y] = nil
-        if startX == nil then
-          startX = x
-          startY = y
-        end
-      end
-    end
-  end
-
-
+  m[startX][startY] = nil
+  m[endX][endY] = nil
   m = generator.edges(acs,dwn,m,tile.sets.wall[1])
-  return {map=m,startX=startX,startY=startY,endX=acs-1,endY=dwn-1}
+  return {map=m,startX=startX,startY=startY,endX=endX,endY=endY}
 end
+
