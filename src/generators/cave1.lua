@@ -238,40 +238,78 @@ function g:generate(acs,dwn)
   for x = 1, acs do
     for y = 1, dwn do
       if self:valid(acs,dwn,x,y,m) 
-        and m[x][y] == nil then 
-          if self:valid(acs,dwn,x,y+1) and m[x][y+1] == 1 then
-            local m2 = self:area(acs,dwn,x,y,m)
-            if self:valid(acs,dwn,x,y+2) and m[x][y+2] ~= 1 then
-              if m2[x][y+2] == 1 then
-                m[x][y+1] = nil
-              end
+          and m[x][y] == nil then 
+        if self:valid(acs,dwn,x,y+1) and m[x][y+1] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x,y+2) and m[x][y+2] ~= 1 then
+            if m2[x][y+2] == 1 and math.random(12) == 1 then
+              m[x][y+1] = nil
             end
           end
-          if self:valid(acs,dwn,x,y-1) and m[x][y-1] == 1 then
-            local m2 = self:area(acs,dwn,x,y,m)
-            if self:valid(acs,dwn,x,y-2) and m[x][y-2] ~= 1 then
-              if m2[x][y-2] == 1 then
-                m[x][y-1] = nil
-              end
+        end
+        if self:valid(acs,dwn,x,y-1) and m[x][y-1] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x,y-2) and m[x][y-2] ~= 1 then
+            if m2[x][y-2] == 1 and math.random(12) == 1 then
+              m[x][y-1] = nil
             end
           end
-          if self:valid(acs,dwn,x+1,y) and m[x+1][y] == 1 then
-            local m2 = self:area(acs,dwn,x,y,m)
-            if self:valid(acs,dwn,x+2,y) and m[x+2][y] ~= 1 then
-              if m2[x+2][y] == 1 then
-                m[x+1][y] = nil
-              end
+        end
+        if self:valid(acs,dwn,x+1,y) and m[x+1][y] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x+2,y) and m[x+2][y] ~= 1 then
+            if m2[x+2][y] == 1 and math.random(12) == 1 then
+              m[x+1][y] = nil
             end
           end
-          if self:valid(acs,dwn,x-1,y) and m[x-1][y] == 1 then
-            local m2 = self:area(acs,dwn,x,y,m)
-            if self:valid(acs,dwn,x-2,y) and m[x-2][y] ~= 1 then
-              if m2[x-2][y] == 1 then
-                m[x-1][y] = nil
-              end
+        end
+        if self:valid(acs,dwn,x-1,y) and m[x-1][y] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x-2,y) and m[x-2][y] ~= 1 then
+            if m2[x-2][y] == 1 and math.random(12) == 1 then
+              m[x-1][y] = nil
             end
           end
+        end
       end
+
+      if self:valid(acs,dwn,x,y,m) 
+          and m[x][y] == nil then 
+        if self:valid(acs,dwn,x,y+1) and m[x][y+1] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x,y+2) and m[x][y+2] ~= 1 then
+            if m2[x][y+2] == 1 then 
+              m[x][y+1] = nil
+            end
+          end
+        end
+        if self:valid(acs,dwn,x,y-1) and m[x][y-1] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x,y-2) and m[x][y-2] ~= 1 then
+            if m2[x][y-2] == 1 then 
+              m[x][y-1] = nil
+            end
+          end
+        end
+        if self:valid(acs,dwn,x+1,y) and m[x+1][y] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x+2,y) and m[x+2][y] ~= 1 then
+            if m2[x+2][y] == 1 then 
+              m[x+1][y] = nil
+            end
+          end
+        end
+        if self:valid(acs,dwn,x-1,y) and m[x-1][y] == 1 then
+          local m2 = self:area(acs,dwn,x,y,m)
+          if self:valid(acs,dwn,x-2,y) and m[x-2][y] ~= 1 then
+            if m2[x-2][y] == 1 then 
+              m[x-1][y] = nil
+            end
+          end
+        end
+      end
+
+
     end
   end
   m = generator.edges(acs,dwn,m,tile.sets.wall[1])
