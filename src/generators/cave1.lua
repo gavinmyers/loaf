@@ -7,6 +7,9 @@ function g:valid(acs,dwn,x,y)
     return false
   end
 end
+function g:surrounded(acs,dwn,x,y,m)
+  return self:cardinals(acs,dwn,x,y,m) + self:neighbors(acs,dwn,x,y,m) == 0 
+end
 function g:cardinals(acs,dwn,x,y,m)
   local c = 0
   if self:valid(acs,dwn,x+1,y+1) and m[x+1][y+1] ~= 1 then
@@ -107,7 +110,95 @@ function g:neighbor(acs,dwn,x,y,m,counter)
   end
   return m
 end
+function g:room(acs,dwn,x,y,m,size)
+  for bx = 0, size do
+    for by = 0, size do
+      if x + bx < acs then
+        if y + by < dwn then
+          m[x + bx][y + by] = nil
+        end
+        if y - by > 1 then
+          m[x + bx][y - by] = nil
+        end
+      end
+      if x - bx > 1 then
+        if y + by < dwn then
+          m[x - bx][y + by] = nil
+        end
+        if y - by > 1 then
+          m[x - bx][y - by] = nil
+        end
+      end
+    end
+  end
+  return m
+end
 function g:generate(acs,dwn)
+  local game = require "game"
+  local tile = require "tile"
+  acs = acs or game.acs
+  dwn = dwn or game.dwn
+  local m = {} 
+  for x = 1, acs do
+    m[x] = {}
+    for y = 1, dwn do
+      m[x][y] = 1 
+    end
+  end
+
+  local startX = math.random(acs - 2) + 1
+  local startY = math.random(dwn - 2) + 1
+  local rm = math.random(3) + 2
+  m = self:room(acs,dwn,startX,startY,m,rm) 
+
+  for i=1,8 do
+    local rx = math.random(acs - 2) + 1
+    local ry = math.random(dwn - 2) + 1
+    local rm = math.random(3) + 2
+    m = self:room(acs,dwn,rx,ry,m,rm) 
+  end
+
+  local endX = math.random(acs - 2) + 1
+  local endY = math.random(dwn - 2) + 1
+  local ext = true 
+  while ext do
+    if m[endX][endY] == 1 then
+      ext = false  
+    else
+      endX = math.random(acs - 2) + 1
+      endY = math.random(dwn - 2) + 1
+    end
+  end
+  local rm = math.random(3) + 2
+  m = self:room(acs,dwn,endX,endY,m,rm) 
+
+  local m2 = {}
+  for x = 1, acs do
+    m2[x] = {}
+    for y = 1, dwn do
+      if self:valid(acs,dwn,x,y,m) ~= true then
+        m2[x][y] = 1
+      elseif self:surrounded(acs,dwn,x,y,m) then
+        m2[x][y] = nil
+      elseif self:neighbors(acs,dwn,x,y,m) == 1 and self:cardinals(acs,dwn,x,y,m) == 0 then
+        m2[x][y] = nil
+      else
+        m2[x][y] = 1
+      end
+    end
+  end
+  for x = 1, acs do
+    for y = 1, dwn do
+      if m2[x][y] == nil then 
+        m[x][y] = nil
+      end
+    end
+  end
+
+  m = generator.edges(acs,dwn,m,tile.sets.wall[1])
+  return {map=m,startX=startX,startY=startY,endX=endX,endY=endY}
+end
+function g:generate2(acs,dwn)
   local game = require "game"
   local tile = require "tile"
   acs = acs or game.acs
