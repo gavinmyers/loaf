@@ -7,6 +7,49 @@ function g:valid(acs,dwn,x,y)
     return false
   end
 end
+function g:area(acs,dwn,x,y,m)
+  local m2 = {}
+  for x = 1, acs do
+    m2[x] = {}
+    for y = 1, dwn do
+      m2[x][y] = 1 
+    end
+  end
+  if m[x][y] ~= nil then
+    return m2
+  end
+  m2[x][y] = nil
+  m2 = self:_area(acs,dwn,x,y,m,m2)
+  return m2
+end
+function g:_area(acs,dwn,x,y,m,m2)
+  if self:valid(acs,dwn,x,y+1) and m[x][y+1] ~= 1 then
+    if m2[x][y+1] == 1 then
+      m2[x][y+1] = nil
+      m2 = self:_area(acs,dwn,x,y+1,m,m2)
+    end
+  end
+  if self:valid(acs,dwn,x,y-1) and m[x][y-1] ~= 1 then
+    if m2[x][y-1] == 1 then
+      m2[x][y-1] = nil
+      m2 = self:_area(acs,dwn,x,y-1,m,m2)
+    end
+  end
+  if self:valid(acs,dwn,x+1,y) and m[x+1][y] ~= 1 then
+    if m2[x+1][y] == 1 then
+      m2[x+1][y] = nil
+      m2 = self:_area(acs,dwn,x+1,y,m,m2)
+    end
+  end
+  if self:valid(acs,dwn,x-1,y) and m[x-1][y] ~= 1 then
+    if m2[x-1][y] == 1 then
+      m2[x-1][y] = nil
+      m2 = self:_area(acs,dwn,x-1,y,m,m2)
+    end
+  end
+  return m2
+
+end
 function g:surrounded(acs,dwn,x,y,m)
   return self:cardinals(acs,dwn,x,y,m) + self:neighbors(acs,dwn,x,y,m) == 0 
 end
@@ -180,8 +223,6 @@ function g:generate(acs,dwn)
         m2[x][y] = 1
       elseif self:surrounded(acs,dwn,x,y,m) then
         m2[x][y] = nil
-      elseif self:neighbors(acs,dwn,x,y,m) == 1 and self:cardinals(acs,dwn,x,y,m) == 0 then
-        m2[x][y] = nil
       else
         m2[x][y] = 1
       end
@@ -194,7 +235,45 @@ function g:generate(acs,dwn)
       end
     end
   end
-
+  for x = 1, acs do
+    for y = 1, dwn do
+      if self:valid(acs,dwn,x,y,m) 
+        and m[x][y] == nil then 
+          if self:valid(acs,dwn,x,y+1) and m[x][y+1] == 1 then
+            local m2 = self:area(acs,dwn,x,y,m)
+            if self:valid(acs,dwn,x,y+2) and m[x][y+2] ~= 1 then
+              if m2[x][y+2] == 1 then
+                m[x][y+1] = nil
+              end
+            end
+          end
+          if self:valid(acs,dwn,x,y-1) and m[x][y-1] == 1 then
+            local m2 = self:area(acs,dwn,x,y,m)
+            if self:valid(acs,dwn,x,y-2) and m[x][y-2] ~= 1 then
+              if m2[x][y-2] == 1 then
+                m[x][y-1] = nil
+              end
+            end
+          end
+          if self:valid(acs,dwn,x+1,y) and m[x+1][y] == 1 then
+            local m2 = self:area(acs,dwn,x,y,m)
+            if self:valid(acs,dwn,x+2,y) and m[x+2][y] ~= 1 then
+              if m2[x+2][y] == 1 then
+                m[x+1][y] = nil
+              end
+            end
+          end
+          if self:valid(acs,dwn,x-1,y) and m[x-1][y] == 1 then
+            local m2 = self:area(acs,dwn,x,y,m)
+            if self:valid(acs,dwn,x-2,y) and m[x-2][y] ~= 1 then
+              if m2[x-2][y] == 1 then
+                m[x-1][y] = nil
+              end
+            end
+          end
+      end
+    end
+  end
   m = generator.edges(acs,dwn,m,tile.sets.wall[1])
   return {map=m,startX=startX,startY=startY,endX=endX,endY=endY}
 end
