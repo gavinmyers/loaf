@@ -5,53 +5,49 @@ local function init()
   end
   local split = function(f,w,h)
     local graphics = {}
+
     local q = love.graphics.newQuad(w+16, h+16, 16, 16, 336, 624)
     graphics["NSEW"] = create(f,q)
 
     local q = love.graphics.newQuad(w+80, h, 16, 16, 336, 624)
     graphics[""] = create(f,q)
 
-    local q = love.graphics.newQuad(w+80, h+16, 16, 16, 336, 624)
-    graphics["WE"] = create(f,q)
+    
+    local q = love.graphics.newQuad(w+48, h+32, 16, 16, 336, 624)
+    graphics["N"] = create(f,q)
+    local q = love.graphics.newQuad(w+48, h, 16, 16, 336, 624)
+    graphics["S"] = create(f,q)
+    local q = love.graphics.newQuad(w+64, h+16, 16, 16, 336, 624)
+    graphics["E"] = create(f,q) 
+    local q = love.graphics.newQuad(w+96, h+16, 16, 16, 336, 624)
+    graphics["W"] = create(f,q)
+
 
     local q = love.graphics.newQuad(w+48, h+16, 16, 16, 336, 624)
     graphics["NS"] = create(f,q)
 
-    local q = love.graphics.newQuad(w+32, h+16, 16, 16, 336, 624)
-    graphics["NSW"] = create(f,q)
-
-    local q = love.graphics.newQuad(w+16, h+32, 16, 16, 336, 624)
-    graphics["NWE"] = create(f,q)
-
-    local q = love.graphics.newQuad(w+16, h, 16, 16, 336, 624)
-    graphics["SWE"] = create(f,q)
-
-    local q = love.graphics.newQuad(w, h+16, 16, 16, 336, 624)
-    graphics["NSE"] = create(f,q)
-
-    local q = love.graphics.newQuad(w+48, h+32, 16, 16, 336, 624)
-    graphics["N"] = create(f,q)
-
-    local q = love.graphics.newQuad(w+48, h, 16, 16, 336, 624)
-    graphics["S"] = create(f,q)
-
+    local q = love.graphics.newQuad(w, h+32, 16, 16, 336, 624)
+    graphics["NE"] = create(f,q)
     local q = love.graphics.newQuad(w+32, h+32, 16, 16, 336, 624)
     graphics["NW"] = create(f,q)
 
+    local q = love.graphics.newQuad(w, h, 16, 16, 336, 624)
+    graphics["SE"] = create(f,q)
     local q = love.graphics.newQuad(w+32, h, 16, 16, 336, 624)
     graphics["SW"] = create(f,q)
 
-    local q = love.graphics.newQuad(w, h+32, 16, 16, 336, 624)
-    graphics["NE"] = create(f,q)
+    local q = love.graphics.newQuad(w+80, h+16, 16, 16, 336, 624)
+    graphics["EW"] = create(f,q)
 
-    local q = love.graphics.newQuad(w, h, 16, 16, 336, 624)
-    graphics["SE"] = create(f,q)
+    local q = love.graphics.newQuad(w+32, h+16, 16, 16, 336, 624)
+    graphics["NSW"] = create(f,q)
+    local q = love.graphics.newQuad(w+16, h+32, 16, 16, 336, 624)
+    graphics["NWE"] = create(f,q)
+    local q = love.graphics.newQuad(w+16, h, 16, 16, 336, 624)
+    graphics["SWE"] = create(f,q)
+    local q = love.graphics.newQuad(w, h+16, 16, 16, 336, 624)
+    graphics["NSE"] = create(f,q)
 
-    local q = love.graphics.newQuad(w+96, h+16, 16, 16, 336, 624)
-    graphics["W"] = create(f,q)
-
-    local q = love.graphics.newQuad(w+64, h+16, 16, 16, 336, 624)
-    graphics["E"] = create(f,q) 
     return graphics
   end
   local floorSet01 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png"),0,48)

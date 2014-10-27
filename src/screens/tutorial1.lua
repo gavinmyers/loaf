@@ -11,8 +11,9 @@ local screen = require "screen"
 local scn = screen:create("TUTORIAL_1")
 scn.data = {}
 function scn:_init()
-  currentMap = generator:get("CAVE_1"):generate(game.acs,24) 
-  self.map.structure = currentMap.map
+  local currentMap = generator:get("CAVE_1"):generate(game.acs,24) 
+  self.map.structure = currentMap.structure
+  self.map.floor = currentMap.floor
   self.map.floor[currentMap.endX][currentMap.endY] = tile.sets.game[3] 
   local ev = event:create("DWN")
   ev.x = currentMap.endX

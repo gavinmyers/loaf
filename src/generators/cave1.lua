@@ -347,6 +347,24 @@ function g:generate(acs,dwn)
   m[startX][startY] = nil
   m[endX][endY] = nil
   m = generator.edges(acs,dwn,m,tile.sets.wall[1])
-  return {map=m,startX=startX,startY=startY,endX=endX,endY=endY}
+  local floor = {}
+  for x = 1, acs do
+    floor[x] = {}
+    for y = 1, dwn do
+      floor[x][y] = {} 
+    end
+  end
+  for x = 1, acs do
+    for y = 1, dwn do
+      if m[x][y] == nil then
+        floor[x][y] = 1 
+      else 
+        floor[x][y] = nil
+      end
+    end
+  end
+
+  floor = generator.edges(acs,dwn,floor,tile.sets.floor[1])
+  return {structure=m,floor=floor,startX=startX,startY=startY,endX=endX,endY=endY}
 end
 
