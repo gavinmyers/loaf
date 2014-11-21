@@ -15,14 +15,16 @@ function _generator()
   end
 
   function generator.edges(acs,dwn,m,set) 
+    local m2 = {}
     for x = 1, acs do
+      m2[x] = {}
       for y = 1, dwn do
         if m[x][y] ~= nil then
-          m[x][y] = set[generator.edge(m,x,y)]
+          m2[x][y] = set[generator.edge(m,x,y)]
         end
       end
     end
-    return m
+    return m2
   end
 
   function generator.edge(m,x,y)
