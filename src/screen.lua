@@ -17,7 +17,7 @@ function _screen()
 
   local lightWorld = love.light.newWorld()
   lightWorld.blur = 10.0
-  lightWorld.setAmbientColor(0, 0, 0) -- optional
+  lightWorld.setAmbientColor(255, 0, 0) -- optional
   local lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
   lightMouse.setGlowStrength(1) -- optional
 
@@ -41,8 +41,13 @@ function _screen()
         return self:_update()
       end
       lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
-      for x = 2, game.acs - 1 do
-        for y = 2, game.dwn - 1 do
+      for x = 1, game.acs  do
+        for y = 1, game.dwn  do
+          if self.map.structure[x][y] ~= nil then
+            local m = game.sz * game.mdf
+            local r = lightWorld.newRectangle(x*m,y*m,m,m) 
+          end
+          --[[
           local e1 = self.map.structure[x-1][y-1]
           local e2 = self.map.structure[x-1][y]
           local e3 = self.map.structure[x-1][y+1]
@@ -59,9 +64,10 @@ function _screen()
             end
           end
           if tt > 1 then 
-            local r = lightWorld.newRectangle(x*16,y*16,16,16) 
+            local r = lightWorld.newRectangle(x*24,y*24,24,24) 
           else
           end
+          ]]--
         end
       end
 
