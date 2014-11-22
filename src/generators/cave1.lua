@@ -364,7 +364,7 @@ function g:generate(acs,dwn)
     end
   end
 
-  floor = generator.edges(acs,dwn,floor,tile.sets.floor[2])
+  floor = generator.edges(acs,dwn,floor,tile.sets.floor[4])
   return {structure=m,floor=floor,startX=startX,startY=startY,endX=endX,endY=endY}
 end
 

@@ -53,6 +53,7 @@ local function init()
   local floorSet01 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png"),0,48)
   local floorSet02 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png"),224,48)
   local floorSet03 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png"),0,96)
-  return {floorSet01,floorSet02,floorSet03}
+  local floorSet04 = split(love.graphics.newImage("resources/DawnLike_1/Objects/Floor.png"),0,192)
+  return {floorSet01,floorSet02,floorSet03,floorSet04}
 end
 return init()
