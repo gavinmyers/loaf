@@ -14,11 +14,13 @@ function _screen()
   local light = require "lib/light"
   local screen = {}
   screen.db = {}
+
   local lightWorld = love.light.newWorld()
   lightWorld.blur = 10.0
   lightWorld.setAmbientColor(0, 0, 0) -- optional
   local lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
   lightMouse.setGlowStrength(1) -- optional
+
 
   function screen:current(id)
     local sc = screen.db[id]
@@ -39,17 +41,33 @@ function _screen()
         return self:_update()
       end
       lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
+      for x = 2, game.acs - 1 do
+        for y = 2, game.dwn - 1 do
+          local e1 = self.map.structure[x-1][y-1]
+          local e2 = self.map.structure[x-1][y]
+          local e3 = self.map.structure[x-1][y+1]
+          local e4 = self.map.structure[x][y-1]
+          local e5 = self.map.structure[x][y+1]
+          local e6 = self.map.structure[x+1][y-1]
+          local e7 = self.map.structure[x+1][y]
+          local e8 = self.map.structure[x+1][y+1]
+          local es = {e1,e2,e3,e4,e5,e6,e7,e8}
+          local tt = 0
+          for i, v in ipairs(es) do
+            if v == nil or v.draw == nil then 
+              tt = tt + 1
+            end
+          end
+          if tt > 1 then 
+            local r = lightWorld.newRectangle(x*16,y*16,16,16) 
+          else
+          end
+        end
+      end
+
     end
 
     function sc:draw()
-      local x = 0
-      for k,v in pairs(_G) do
-        x = x + 1
-      end
-      if x > 95 then 
-        print(x)
-        error("NEW GLOBAL ") 
-      end
       if self._draw ~= nil then
         self:_draw()
       end
