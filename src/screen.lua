@@ -17,15 +17,37 @@ function _screen()
 
   local lightWorld = love.light.newWorld()
   lightWorld.blur = 10.0
-  lightWorld.setAmbientColor(255, 0, 0) -- optional
+  lightWorld.setAmbientColor(50, 50, 50) -- optional
   local lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
-  lightMouse.setGlowStrength(1) -- optional
+  lightMouse.setGlowStrength(1)
+  local lightRedraw = true
 
 
   function screen:current(id)
     local sc = screen.db[id]
+    print(sc)
     sc:init()
     game.screen = sc
+
+    lightRedraw = true
+    if lightRedraw == true then
+      lightRedraw = false
+      for x = 1, game.acs  do
+        for y = 1, game.dwn  do
+          if sc.map.structure[x][y] ~= nil then
+            local e = generator.edge(sc.map.structure, x, y)
+            local m = game.sz * game.mdf
+            if e == "NS" or e == "N" or e == "S" then
+              local r = lightWorld.newRectangle((x*m)+8,y*m,8,16) 
+            elseif e == "EW" or e == "W" or e == "E" then
+              local r = lightWorld.newRectangle(x*m,(y*m)+8,16,8) 
+            end
+          end
+        end
+      end
+    end
+
+    
   end
   function screen:create(id)
     local sc = {}
@@ -41,35 +63,7 @@ function _screen()
         return self:_update()
       end
       lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
-      for x = 1, game.acs  do
-        for y = 1, game.dwn  do
-          if self.map.structure[x][y] ~= nil then
-            local m = game.sz * game.mdf
-            local r = lightWorld.newRectangle(x*m,y*m,m,m) 
-          end
-          --[[
-          local e1 = self.map.structure[x-1][y-1]
-          local e2 = self.map.structure[x-1][y]
-          local e3 = self.map.structure[x-1][y+1]
-          local e4 = self.map.structure[x][y-1]
-          local e5 = self.map.structure[x][y+1]
-          local e6 = self.map.structure[x+1][y-1]
-          local e7 = self.map.structure[x+1][y]
-          local e8 = self.map.structure[x+1][y+1]
-          local es = {e1,e2,e3,e4,e5,e6,e7,e8}
-          local tt = 0
-          for i, v in ipairs(es) do
-            if v == nil or v.draw == nil then 
-              tt = tt + 1
-            end
-          end
-          if tt > 1 then 
-            local r = lightWorld.newRectangle(x*24,y*24,24,24) 
-          else
-          end
-          ]]--
-        end
-      end
+
 
     end
 
@@ -93,8 +87,9 @@ function _screen()
       self:drawMapSet(self.map.gui_2)
       self:drawMapSet(self.map.gui_3)
 
+
       lightWorld.update()
-      love.graphics.scale(1.5,1.5)
+      --love.graphics.scale(1.5,1.5)
       lightWorld.drawShadow()
 
     end
@@ -125,6 +120,8 @@ function _screen()
       if self._init ~= nil then
         return self:_init()
       end
+
+
     end
     function sc:addEffect(id,x,y,source,target)
       local ef = effect:get(id)

@@ -7,10 +7,10 @@ function _game()
   love.graphics.setFont(font)
   game.font = font 
   -- board and window settings
-  game.sz = 24 -- tile size in pixels
+  game.sz = 16 -- tile size in pixels
   game.acs = 48 -- board size in tiles (Across)
   game.dwn = 32 -- board size in tiles (Down)
-  game.mdf = 1.5 -- tile size modifier... needed for drawing large tiles 2 = 2 times current tile size
+  game.mdf = 1 -- tile size modifier... needed for drawing large tiles 2 = 2 times current tile size
   game.mdf_big = 4 -- big 
   game.w = game.sz * (game.acs + 2) -- window size in pixels (width) 
   game.h = game.sz * (game.dwn + 2) -- window size in pixels (height) 
