@@ -13,11 +13,6 @@ local light = require "lib/light"
 local scn = screen:create("TUTORIAL_1")
 scn.data = {}
 
-scn.data["lightWorld"] = love.light.newWorld()
-scn.data["lightWorld"].blur = 10.0
-scn.data["lightWorld"].setAmbientColor(50, 50, 50) -- optional
-scn.data["lightMouse"] = scn.data["lightWorld"].newLight(255, 255, 255, 255, 255, 300)
-scn.data["lightMouse"].setGlowStrength(1)
 
 function scn:_init()
   local currentMap = generator:get("CAVE_1"):generate(game.acs,24) 
@@ -73,7 +68,12 @@ function scn:_init()
   self.map.creatures[player.x][player.y] = player
   self.map.creatures[goblin.x][goblin.y] = goblin 
 
-  local lightWorld = self.data["lightWorld"]
+  local lightWorld = love.light.newWorld() 
+  lightWorld.blur = 10.0
+  lightWorld.setAmbientColor(50,50,50)
+  local lightMouse = lightWorld.newLight(255,255,255,255,255,300) 
+
+
   for x = 1, game.acs  do
     for y = 1, game.dwn  do
       if self.map.structure[x][y] ~= nil then
@@ -88,6 +88,8 @@ function scn:_init()
     end
   end
 
+  self.data["lightWorld"] = lightWorld 
+  self.data["lightMouse"] = lightMouse 
 end
 function scn:_update()
   local lightMouse = self.data["lightMouse"]
