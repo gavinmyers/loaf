@@ -8,8 +8,17 @@ local tile = require "tile"
 local event = require "event"
 local effect = require "effect"
 local screen = require "screen"
+local shader = require "lib/postshader"
+local light = require "lib/light"
 local scn = screen:create("TUTORIAL_1")
 scn.data = {}
+
+scn.data["lightWorld"] = love.light.newWorld()
+scn.data["lightWorld"].blur = 10.0
+scn.data["lightWorld"].setAmbientColor(50, 50, 50) -- optional
+scn.data["lightMouse"] = scn.data["lightWorld"].newLight(255, 255, 255, 255, 255, 300)
+scn.data["lightMouse"].setGlowStrength(1)
+
 function scn:_init()
   local currentMap = generator:get("CAVE_1"):generate(game.acs,24) 
   self.map.structure = currentMap.structure
@@ -63,12 +72,37 @@ function scn:_init()
   goblin.damage = 0 
   self.map.creatures[player.x][player.y] = player
   self.map.creatures[goblin.x][goblin.y] = goblin 
+
+  local lightWorld = self.data["lightWorld"]
+  for x = 1, game.acs  do
+    for y = 1, game.dwn  do
+      if self.map.structure[x][y] ~= nil then
+        local e = generator.edge(self.map.structure, x, y)
+        local m = game.sz * game.mdf
+        if e == "NS" or e == "N" or e == "S" then
+          local r = lightWorld.newRectangle((x*m)+8,y*m,8,16) 
+        elseif e == "EW" or e == "W" or e == "E" then
+          local r = lightWorld.newRectangle(x*m,(y*m)+8,16,8) 
+        end
+      end
+    end
+  end
+
+end
+function scn:_update()
+  local lightMouse = self.data["lightMouse"]
+  lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
 end
 function scn:_draw()
   love.graphics.setColor(255, 255, 255)
   local screenWidth, screenHeight = love.window.getDimensions()
   love.graphics.setFont(game.font)
   love.graphics.printf("\n Kill the guard! \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, screenHeight - 200, screenWidth, "left")
+end
+function scn:_drawShadows() 
+  local lightWorld = self.data["lightWorld"]
+  lightWorld.update()
+  lightWorld.drawShadow()
 end
 function scn:_keypressed(key)
   self.changed = true

@@ -10,45 +10,15 @@ function _screen()
   local event = require "event"
   local effect = require "effect"
   local event = require "event"
-  local shader = require "lib/postshader"
-  local light = require "lib/light"
   local screen = {}
   screen.db = {}
 
-  local lightWorld = love.light.newWorld()
-  lightWorld.blur = 10.0
-  lightWorld.setAmbientColor(50, 50, 50) -- optional
-  local lightMouse = lightWorld.newLight(255, 255, 255, 255, 255, 300)
-  lightMouse.setGlowStrength(1)
-  local lightRedraw = true
-
-
   function screen:current(id)
     local sc = screen.db[id]
-    print(sc)
     sc:init()
     game.screen = sc
-
-    lightRedraw = true
-    if lightRedraw == true then
-      lightRedraw = false
-      for x = 1, game.acs  do
-        for y = 1, game.dwn  do
-          if sc.map.structure[x][y] ~= nil then
-            local e = generator.edge(sc.map.structure, x, y)
-            local m = game.sz * game.mdf
-            if e == "NS" or e == "N" or e == "S" then
-              local r = lightWorld.newRectangle((x*m)+8,y*m,8,16) 
-            elseif e == "EW" or e == "W" or e == "E" then
-              local r = lightWorld.newRectangle(x*m,(y*m)+8,16,8) 
-            end
-          end
-        end
-      end
-    end
-
-    
   end
+
   function screen:create(id)
     local sc = {}
     sc.id = id
@@ -62,9 +32,11 @@ function _screen()
       if self._update ~= nil then
         return self:_update()
       end
-      lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
-
-
+    end
+    function sc:drawShadows()
+      if self._drawShadows ~= nil then
+        return self:_drawShadows()
+      end
     end
 
     function sc:draw()
@@ -86,12 +58,7 @@ function _screen()
       self:drawMapSet(self.map.gui_1)
       self:drawMapSet(self.map.gui_2)
       self:drawMapSet(self.map.gui_3)
-
-
-      lightWorld.update()
-      --love.graphics.scale(1.5,1.5)
-      lightWorld.drawShadow()
-
+      self:drawShadows()
     end
 
     function sc:init()
