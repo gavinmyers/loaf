@@ -93,13 +93,14 @@ function scn:_init()
 end
 function scn:_update()
   local lightMouse = self.data["lightMouse"]
-  lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
+  --lightMouse.setPosition(love.mouse.getX(), love.mouse.getY())
+  lightMouse.setPosition(self.player.x * 16, self.player.y * 16)
 end
 function scn:_draw()
   love.graphics.setColor(255, 255, 255)
   local screenWidth, screenHeight = love.window.getDimensions()
   love.graphics.setFont(game.font)
-  love.graphics.printf("\n Kill the guard! \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, screenHeight - 200, screenWidth, "left")
+  love.graphics.printf("\n Kill the guard! \n\n Use the [w a s d] keys to attack the guard. Don't worry, you're already equiped with a weapon. When he's dead flee down the staircase.", 25, screenHeight - 100, screenWidth, "left")
 end
 function scn:_drawShadows() 
   local lightWorld = self.data["lightWorld"]
