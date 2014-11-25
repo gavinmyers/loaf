@@ -22,10 +22,24 @@ function main()
   love.window.setMode(game.w, game.h)
   screen:current("WELCOME")
 end
+local keypressed = nil
+local keycounter = 0
 function love.keypressed(key)
-  game.screen:keypressed(key)
+  keypressed = key 
+end
+function love.keyreleased(key)
+  if key == keypressed then
+    keypressed = nil
+    game.screen:keyreleased(key)
+  end
 end
 function love.update(dt)
+  if keycounter <= 0 and keypressed ~= nil then
+    keycounter = 0.1 
+    game.screen:keypressed(keypressed)
+  end
+  print(keycounter)
+  keycounter = keycounter - dt
   game.screen:update(dt)
 end
 function love.draw()

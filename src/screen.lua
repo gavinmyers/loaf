@@ -28,6 +28,11 @@ function _screen()
         return self:_keypressed(key)
       end
     end
+    function sc:keyreleased(key)
+      if self._keyreleased ~= nil then
+        return self:_keyreleased(key)
+      end
+    end 
     function sc:update()
       if self._update ~= nil then
         return self:_update()

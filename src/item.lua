@@ -10,6 +10,9 @@ function _item()
     ni.id = id
     ni.x = 0
     ni.y = 0
+    ni.h = 16
+    ni.w = 16
+    ni.speed = 128
     ni.tile = nil
     ni.screen = screen
     function ni:interact(target)

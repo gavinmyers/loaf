@@ -70,7 +70,7 @@ function scn:_init()
 
   local lightWorld = love.light.newWorld() 
   lightWorld.blur = 10.0
-  lightWorld.setAmbientColor(50,50,50)
+  lightWorld.setAmbientColor(0,0,0)
   local lightMouse = lightWorld.newLight(255,255,255,255,255,300) 
 
 
