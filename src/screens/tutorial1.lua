@@ -117,12 +117,20 @@ function scn:_keypressed(key)
     self.data.selected = self.data.selected + 1 
   elseif key == "w" then
     game:action(self.player, self.player.x, self.player.y-1)
+    self.player.cy = -1
+    self.player.cx = 0
   elseif key == "a" then
     game:action(self.player, self.player.x-1, self.player.y)
+    self.player.cy = 0 
+    self.player.cx = -1 
   elseif key == "s" then
     game:action(self.player, self.player.x, self.player.y+1)
+    self.player.cy = 1 
+    self.player.cx = 0 
   elseif key == "d" then
     game:action(self.player, self.player.x+1, self.player.y)
+    self.player.cy = 0 
+    self.player.cx = 1 
   elseif key == "q" then
     game.mode = "ABILITY"
     game:action(self.player, 
