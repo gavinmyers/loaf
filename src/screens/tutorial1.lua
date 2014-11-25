@@ -131,7 +131,7 @@ function scn:_keypressed(key)
     game:action(self.player, self.player.x+1, self.player.y)
     self.player.cy = 0 
     self.player.cx = 1 
-  elseif key == "q" then
+  elseif key == "ralt" then
     game.mode = "ABILITY"
     game:action(self.player, 
                 self.player.x+self.player.cx, 
