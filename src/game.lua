@@ -44,7 +44,9 @@ function _game()
     local defendRoll = math.random(1,defender.defend * 6)
     for i = 1, #defender.abilities do
       local abilityMod = defender.abilities[i]
-      defendRoll = defendRoll * abilityMod:defendMod(ability,attacker,defender)
+      local defendMod = abilityMod:defendMod(ability,attacker,defender)
+      print(defendMod)
+      defendRoll = defendRoll * defendMod 
     end
 
     if attackRoll > defendRoll then
@@ -125,6 +127,8 @@ function _game()
         else
           self.screen:addEffect("DEFEND",targetX,targetY,attacker,defender)
         end
+      else
+        self.screen:addEffect("DAMAGE",targetX,targetY,who,nil)
       end
       self.mode = "MOVE" 
     end

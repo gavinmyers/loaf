@@ -8,6 +8,8 @@ function _item()
     ni.transparency = 0
     ni.size = 100
     ni.id = id
+    ni.cx = 0
+    ni.cy = 0
     ni.x = 0
     ni.y = 0
     ni.h = 16

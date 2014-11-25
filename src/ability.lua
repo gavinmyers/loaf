@@ -47,9 +47,11 @@ function _ability()
     end
 
     function newAbility:defendMod(ability,attacker,defender)
+      local res = 0
       if self._defendMod ~= nil then
         return self:_defendMod(ability,attacker,defender)
       end
+      return res 
     end
 
     function newAbility:damage(attacker,defender)
@@ -81,9 +83,11 @@ function _ability()
     end
 
     function newAbility:soakMod(ability,attacker,defender)
+      local res = 0
       if self._soakMod ~= nil then
-        return self:_soakMod(ability,attacker,defender)
+        res = self:_soakMod(ability,attacker,defender)
       end
+      return res
     end
 
     self.db[id] = newAbility
