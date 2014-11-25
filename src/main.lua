@@ -38,8 +38,11 @@ function love.update(dt)
     keycounter = 0.1 
     game.screen:keypressed(keypressed)
   end
-  print(keycounter)
-  keycounter = keycounter - dt
+  if keypressed ~= nil then
+    keycounter = keycounter - dt
+  else
+    keycounter = 0
+  end
   game.screen:update(dt)
 end
 function love.draw()
